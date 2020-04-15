@@ -65,8 +65,7 @@ namespace MielsJimmyScrumProject
             }
             else
             {
-                //staging && production
-
+           
                 app.UseExceptionHandler("/Error");
                 app.UseStatusCodePagesWithReExecute("/Error/{0}");
             }

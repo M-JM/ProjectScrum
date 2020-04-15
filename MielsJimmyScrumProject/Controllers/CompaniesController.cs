@@ -85,8 +85,6 @@ namespace MielsJimmyScrumProject.Controllers
         public async Task<IActionResult> DetailsAsync(int id)
         {
 
-            throw new Exception();
-
             var company = _companyRepository.GetById(id);
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
             var IsSuperAdmin = User.IsInRole("SuperAdmin");

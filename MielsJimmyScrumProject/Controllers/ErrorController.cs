@@ -23,7 +23,9 @@ namespace MielsJimmyScrumProject.Controllers
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
         }
-      
+  
+        
+        [HttpGet]
         [AllowAnonymous]
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)
@@ -44,7 +46,7 @@ namespace MielsJimmyScrumProject.Controllers
 
             return View("NotFound", ErrorMessages);
         }
-
+        [HttpGet]
         [AllowAnonymous]
         [Route("Error")]
         public IActionResult Error()
@@ -60,12 +62,12 @@ namespace MielsJimmyScrumProject.Controllers
             _logger.LogError($"The path {exceptiondetails.Path} " +
                $"threw an exception {exceptiondetails.Error}");
             
-            if(_webHostEnvironment.EnvironmentName == "Staging")
-            {
-                return View(exceptiondetailsModel);
-            }
+            //if(_webHostEnvironment.EnvironmentName == "Staging")
+            //{
+            //    return View(exceptiondetailsModel);
+            //}
 
-            return View();
+            return View(exceptiondetailsModel);
                             
         }
     }

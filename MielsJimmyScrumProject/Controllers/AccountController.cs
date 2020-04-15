@@ -36,6 +36,7 @@ namespace MielsJimmyScrumProject.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminRegister(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -77,6 +78,7 @@ namespace MielsJimmyScrumProject.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -122,6 +124,7 @@ namespace MielsJimmyScrumProject.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginAsync(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
@@ -152,6 +155,7 @@ namespace MielsJimmyScrumProject.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
