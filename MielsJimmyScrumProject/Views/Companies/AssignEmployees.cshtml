@@ -1,0 +1,43 @@
+﻿@model List<AssignEmployeesViewModel>
+@inject UserManager<ApplicationUser> userManager;
+@{
+    var companyId = ViewBag.companyId;
+    ViewData["Title"] = "Edit User In Role";
+}
+
+<h1>Assign Employees to Company</h1>
+
+<form method="post">
+    <div class="card">
+        <div class="card-header">
+            <h2>Add or Remove Employees from this Company</h2>
+        </div>
+        <div class="card-body">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <div class="form-check m-1">
+                    <input type="hidden" asp-for="@Model[i].UserId" />
+                    <input type="hidden" asp-for="@Model[i].UserName" />
+                    <input asp-for="@Model[i].IsSelected" class="form-check-input" />
+                    <label class="form-check-label" asp-for="@Model[i].IsSelected">
+                        @Model[i].UserName
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-warning" asp-route-companyid="@companyId" style="width:auto;">Update EmployeeList</button>
+
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary">Back to overview</a>
+            }
+            else
+            {
+                <a asp-action="Details" asp-controller="Companies" asp-route-id="@companyId" class="btn btn-secondary">Cancel</a>
+            }
+
+        </div>
+    </div>
+</form>

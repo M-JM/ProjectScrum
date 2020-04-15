@@ -1,0 +1,21 @@
+﻿@model IEnumerable<Board>
+@{
+    ViewBag.Title = "Boards List";
+}
+<div class="card-deck">
+    @foreach (var board in Model)
+    {
+      
+
+        <div class="card m-3" style="min-width: 18rem; max-width: 30.5%;">
+            <div class="card-header">
+                <h3>@board.Name</h3>
+            </div>
+            <div class="card-footer text-center">
+                <a asp-action="Details" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-info">Details</a>
+                <a asp-action="Update" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-warning">Update</a>
+                <a asp-action="Delete" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,143 @@
+﻿@model TaskDetailViewModel
+@inject UserManager<ApplicationUser> userManager;
+
+@{
+    ViewData["Title"] = "Index";
+    var user = await userManager.GetUserAsync(Context.User);
+}
+
+<div class="container-fluid mb-2">
+    <h1 class="mb-2">Board Name : @Model.BoardName</h1>
+    <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+            <a asp-action="Details" asp-controller="Boards" asp-route-id="@Model.BoardId" class="btn btn-primary mr-1">View Board Details</a>
+            <div class="btn-group" role="group">
+
+                @if (await userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-primary mr-1">Return to Overview</a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-controller="home">Back to List</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+
+    <div class="card-group col-4">
+        <div class="card bg-default">
+            <div class="card-header text-center">
+                <strong>To Do</strong>
+            </div>
+
+            <div class="card-body text-center">
+                @foreach (var task in Model.TodoTasks)
+                {
+                    <div class="card mb-2 text-white bg-dark text-center">
+                        <div class="card-header">
+                            <strong>
+                                @task.Title
+                            </strong>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="card-text">
+                                @task.Description
+                            </p>
+                            <footer class="blockquote-footer text-white">
+                                assigned to user :  @task.ApplicationUser.UserName
+                            </footer>
+                            <div class="card-body text-center">
+                                <p class="card-text ">
+                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
+        </div>
+    </div>
+    <div class="card-group col-4">
+        <div class="card bg-default">
+            <div class="card-header text-center">
+                <strong>Doing</strong>
+            </div>
+
+            <div class="card-body text-center">
+                @foreach (var task in Model.DoingTasks)
+                {
+                    <div class="card mb-2 text-white bg-dark text-center">
+                        <div class="card-header">
+                            <strong>
+                                @task.Title
+                            </strong>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="card-text">
+                                @task.Description
+                            </p>
+                            <footer class="blockquote-footer text-white">
+                                assigned to user :  @task.ApplicationUser.UserName
+                            </footer>
+                            <div class="card-body text-center">
+                                <p class="card-text ">
+                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
+        </div>
+    </div>
+    <div class="card-group col-4">
+        <div class="card bg-default">
+            <div class="card-header text-center">
+                <strong>Done</strong>
+            </div>
+
+            <div class="card-body text-center">
+                @foreach (var task in Model.DoneTasks)
+                {
+                    <div class="card mb-2 text-white bg-dark text-center">
+                        <div class="card-header">
+                            <strong>
+                                @task.Title
+                            </strong>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="card-text">
+                                @task.Description
+                            </p>
+                            <footer class="blockquote-footer text-white">
+                                assigned to user :  @task.ApplicationUser.UserName
+                            </footer>
+                            <div class="card-body text-center">
+                                <p class="card-text ">
+                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+</div>
+
+
+

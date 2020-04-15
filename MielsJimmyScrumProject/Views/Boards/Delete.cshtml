@@ -1,0 +1,33 @@
+﻿@model Board
+
+@{
+    ViewData["Title"] = "Delete Board";
+ }
+    <div class="row justify-content-center m-3">
+        <div class="col-sm-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h1>@Model.Name</h1>
+                </div>
+                <div class="card-body text-center">
+                    <h3 class="text-danger"> Deleting this board will also delete all related tasks and it's assigned users </h3>
+                </div>
+
+
+                <div class="card-body text-center">
+                    <h4>Board ID: @Model.Id</h4>
+                    <h4>Board Name: @Model.Name</h4>
+                    <h4>Description: @Model.Description</h4>
+                    <h4>Created By: @Model.CreatedBy</h4>
+                    <h4>Created Date: @Model.CreatedDate</h4>
+
+                </div>
+                <div class="card-footer text-center">
+                
+                    <a asp-action="DeleteSure" asp-controller="Boards" asp-route-id="@Model.Id " class="btn btn-danger">Delete</a>
+                    <a asp-action="Details" asp-controller="Boards" asp-route-id="@Model.Id " class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+

@@ -1,0 +1,37 @@
+﻿@model int
+
+@{
+    ViewBag.Title = "404 Error";
+}
+
+
+<div class="container perfect-centering">
+    <div class="row text-center">
+        <div class="col-lg-6 offset-lg-3 col-md-6 offset-md-3 col-12 p-3 error-main">
+            <div class="row">
+                <div class="col-lg-8 col-12 col-sm-10 offset-lg-2 offset-sm-1">
+                    <h1 class="m-0">404</h1>
+                    <h6>Company not found</h6>
+                    <p>Company with ID = @Model cannot be found</p>
+                    <h6>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-success">Back to overview</a>
+                        }
+                        else
+                        {
+                            <a asp-action="CompanyList" asp-controller="Companies" class="btn btn-success">Return to company Overview</a>
+                        }
+                    </h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*Design from taken from = https://www.nicesnippets.com/snippet/bootstrap-4-page-not-found-404-error-page-design*@
+
+@section Styles {
+    <link href="~/css/Error.css" rel="stylesheet" asp-append-version="true" />
+}

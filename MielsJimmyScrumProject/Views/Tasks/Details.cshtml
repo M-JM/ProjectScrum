@@ -1,0 +1,35 @@
+﻿@model TaskEditViewModel
+
+@{
+    ViewData["Title"] = "Details of Task";
+
+}
+
+
+<div class="row justify-content-center m-3">
+    <div class="col-sm-8">
+        <div class="card">
+            <div class="card-header">
+                <h1>@Model.Title</h1>
+            </div>
+
+            <div class="card-body text-center">
+
+
+                <h4>Task ID: @Model.Id</h4>
+                <h4>Task Description: @Model.Description</h4>
+                <h4>Task Status : @Model.Status</h4>
+                <h4>Created By: @Model.CreatedBy</h4>
+                <h4>Created Date: @Model.CreatedDate</h4>
+            </div>
+
+            <div class="card-footer text-center">
+                <a asp-action="Update" asp-controller="Tasks" asp-route-taskid="@Model.Id" class="btn btn-warning">Edit</a>
+                <a asp-action="Delete" asp-controller="Tasks" asp-route-taskid="@Model.Id" class="btn btn-danger">Delete</a>
+                <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@Model.BoardId" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+

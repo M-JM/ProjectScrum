@@ -1,0 +1,31 @@
+﻿@model ExceptionDetail
+
+<div class="container" style="background-color:rgb(0, 148, 255)">
+    <div class="text-center align-content-center">
+        <h3>
+            Oh no ! My Spaghetti code is not working properly.
+        </h3>
+        <h3> I will Fix it as soon as I can. </h3>
+        <img src="~/images/spagett.jpg" />
+        <h4>Please contact the site administration at zfzfzf@gmail.com </h4>
+    </div>
+
+    <h3>Exception Details:</h3>
+    <div class="alert alert-danger">
+        <h5>Exception Path</h5>
+        <hr />
+        <p>@Model.ExceptionPath</p>
+    </div>
+
+    <div class="alert alert-danger">
+        <h5>Exception Message</h5>
+        <hr />
+        <p>@Model.ExceptionMessage</p>
+    </div>
+
+    <div class="alert alert-danger">
+        <h5>Exception Stack Trace</h5>
+        <hr />
+        <p>@Model.Stacktrace</p>
+    </div>
+</div>

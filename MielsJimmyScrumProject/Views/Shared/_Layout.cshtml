@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+</head>
+<body>
+
+    <div>
+        <partial name="_NavBar" />
+    </div>
+
+    <div class="container-fluid">
+        @RenderBody()
+    </div>
+
+
+    <partial name="_ValidationScriptsPartial" />
+    @if (IsSectionDefined("Scripts"))
+    {
+        @RenderSection("Scripts", required: false)
+    }
+
+    @if (IsSectionDefined("Styles"))
+    {
+        @RenderSection("Styles", required: false)
+    }
+
+
+</body>
+</html>

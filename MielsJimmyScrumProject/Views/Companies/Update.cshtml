@@ -1,0 +1,70 @@
+﻿@model CompanyEditViewModel
+@inject SignInManager<ApplicationUser> signInManager;
+
+@{
+    ViewData["Title"] = "Update Company ";
+    var photopath = $"~/Images/{Model.ExistingPhotoPath ?? "noimage.png"}";
+}
+
+    <form asp-action="Update" asp-controller="Companies" method="post" class="mt-3" enctype="multipart/form-data">
+        <input hidden asp-for="Id" />
+        <input hidden asp-for="ExistingPhotoPath" />
+
+
+
+        <div class="form-group row">
+            <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Name" class="form-control" placeholder="Name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label asp-for="Photo" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <div class="custom-file">
+                    <input asp-for="Photo" class="form-control custom-file-input" />
+                    <label class="custom-file-label">Choose File...</label>
+                </div>
+                <span asp-validation-for="Photo" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row col-sm-4 offset-4">
+            <img class="" style="height:200px;width:auto;" src="@photopath" asp-append-version="true" />
+        </div>
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+    
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-success">Update</button>
+                    @if (User.IsInRole("Admin"))
+                    { 
+                    <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary">Back</a>
+                    }
+                    else
+                    {
+                    <a asp-action="details" asp-controller="Companies" asp-route-id="@Model.Id" class="btn btn-secondary">Back</a>
+                    }
+                </div>
+            </div>
+
+        </form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileLabel = $(this).next('.custom-file-label');
+                var files = $(this)[0].files;
+                if (files.length > 1) {
+                    fileLabel.html(files.length + ' files selected');
+                }
+                else if (files.length == 1) {
+                    fileLabel.html(files[0].name);
+                }
+            });
+        });</script>
+}

@@ -1,0 +1,49 @@
+﻿@model BoardDetailViewModel
+
+@{
+    ViewData["Title"] = "Details of Board";
+    var board = Model.Board;
+
+}
+
+
+<div class="row justify-content-center m-3">
+    <div class="col-sm-8">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1>@board.Name</h1>
+            </div>
+
+            <div class="card-body text-center">
+
+
+                <h4>Board ID: @board.Id</h4>
+                <h4>Board Name: @board.Name</h4>
+                <h4>Board Description: @board.Description</h4>
+                <h4>Created By: @board.CreatedBy</h4>
+                <h4>Created Date: @board.CreatedDate</h4>
+            </div>
+
+            <div class="card-footer text-center">
+                <a asp-action="AssignUsers" asp-controller="Boards" asp-route-boardid="@board.Id" class="btn btn-success">Manage board users</a>
+                <a asp-action="Create" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-success">Add Task</a>
+                <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-dark">View Tasks</a>
+                <a asp-action="Update" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-warning">Edit</a>
+                <a asp-action="Delete" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-danger">Delete</a>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary">Back</a>
+                }
+                else
+                {
+                    <a asp-action="CompanyList" asp-controller="Companies" class="btn btn-secondary">Back</a>
+                }
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+

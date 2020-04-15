@@ -1,0 +1,38 @@
+﻿@model ErrorMessage
+
+
+@{
+    ViewBag.Title = "Not Found";
+}
+
+
+<div class="container" style="background-color:rgb(0, 148, 255)">
+    <div class="text-center align-content-center">
+        <h3>
+            PAGE 404 - The page does not exist
+        </h3>
+    </div>
+
+    <div> <a asp-controller="Home" asp-action="index" class="btn btn-info m-1 align-content-center">Click here to Navigate to Home Page</a></div>
+
+    <div class="align-content-center">
+        <h3>Page Details:</h3>
+        <div class="alert alert-dark">
+            <h5>Error Message</h5>
+            <hr />
+            <p>@Model.TheErrorMessage</p>
+        </div>
+
+        <div class="alert alert-dark">
+            <h5>Path</h5>
+            <hr />
+            <p>@Model.Path</p>
+        </div>
+
+        <div class="alert alert-dark">
+            <h5>Qs</h5>
+            <hr />
+            <p>@Model.Qs</p>
+        </div>
+    </div>
+</div>
