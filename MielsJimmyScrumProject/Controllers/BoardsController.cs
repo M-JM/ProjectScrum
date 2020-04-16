@@ -16,25 +16,28 @@ namespace MielsJimmyScrumProject.Controllers
     [Authorize(Roles = "SuperAdmin,Admin,User")]
     public class BoardsController : Controller
     {
-        private readonly IBoardRepository _BoardRepository;
-        private readonly ICompanyRepository _CompanyRepository;
+        private readonly IBoardRepository _boardRepository;
+        private readonly ICompanyRepository _companyRepository;
         private readonly ITaskRepository _taskRepository;
-        private readonly UserManager<ApplicationUser> _UserManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public BoardsController(IBoardRepository boardRepository,ICompanyRepository companyRepository, ITaskRepository taskRepository,
             UserManager<ApplicationUser> userManager)
         {
-            _BoardRepository = boardRepository;
-            _CompanyRepository = companyRepository;
+            _boardRepository = boardRepository;
+            _companyRepository = companyRepository;
             _taskRepository = taskRepository;
-            _UserManager = userManager;
+            _userManager = userManager;
         }
      
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public IActionResult Create(int companyid)
         {
+            
+            var company = _companyRepository.GetById(companyid);
 
-            var company = _CompanyRepository.GetById(companyid);
+            if(company != null || company.IsDeleted != true) { 
            
             BoardCreateViewModel boardCreateViewModel = new BoardCreateViewModel()
             {
@@ -44,48 +47,81 @@ namespace MielsJimmyScrumProject.Controllers
             };
 
             return View(boardCreateViewModel);
+            }
+
+            Response.StatusCode = 404;
+            return View("CompanyNotFound", companyid);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(BoardCreateViewModel model)
+        [Authorize(Roles = "SuperAdmin, Admin")]
+        public async Task<IActionResult> CreateAsync(BoardCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
-             
-                model.CreatedDate = DateTime.Now;
-                model.CreatedBy = User.Identity.Name;
-                   
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+
+                if (IsSuperAdmin || model.CompanyId == currentuser.CompanyId) { 
+
+                    model.CreatedDate = DateTime.Now;
+                    model.CreatedBy = User.Identity.Name;
+
+                    var response = _boardRepository.Create(model);
+
+                    if (response != null && response.Id != 0)
+                    {
+                        return RedirectToAction("details", new { id = model.Id });
+                    }
+                    return View(model);
                 }
-
-                var response = _BoardRepository.Create(model);
-
-                if (response != null && response.Id != 0)
-                {
-                    return RedirectToAction("details", new { id = model.Id });
-                }
-
+                return View("NotAuthorized");
+            }
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult Details(int id)
-        {
-            var board = _BoardRepository.GetById(id);
+        //TODO CHECK ALL RETURNS
 
-            BoardDetailViewModel detailViewModel = new BoardDetailViewModel()
+        [HttpGet]
+        public async Task<IActionResult> DetailsAsync(int id)
+        {
+            var board = _boardRepository.GetById(id);
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+
+            if (board == null || board.IsDeleted == true)
+            {
+                Response.StatusCode = 404;
+                return View("BoardNotFound", id);
+            }
+            else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId) { 
+
+                BoardDetailViewModel detailViewModel = new BoardDetailViewModel()
             {
                 Board  = board
             };
             return View(detailViewModel);
+            }
+            return View("NotAuthorized");
         }
 
         [HttpGet]
-        public IActionResult Update(int id)
+        [Authorize(Roles = "SuperAdmin, Admin")]
+        public async Task<IActionResult> UpdateAsync(int id)
         {
-            var board = _BoardRepository.GetById(id);
-
-            var boardEditViewModel = new BoardEditViewModel
+            var board = _boardRepository.GetById(id);
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+            
+            if (board == null || board.IsDeleted == true)
+            {
+                Response.StatusCode = 404;
+                return View("BoardNotFound", id);
+            }
+            else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId)
+            {
+                var boardEditViewModel = new BoardEditViewModel
             {
                 Id = board.Id,
                 Name = board.Name,
@@ -94,16 +130,21 @@ namespace MielsJimmyScrumProject.Controllers
             };
 
             return View(boardEditViewModel);
+            }
+
+            return View("NotAuthorized");
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public IActionResult Update(BoardEditViewModel editModel)
         {
 
             if (ModelState.IsValid)
             {
-                var board = _BoardRepository.GetById(editModel.Id);
+                var board = _boardRepository.GetById(editModel.Id);
 
                 board.Name = editModel.Name;
                 board.Description = editModel.Description;
@@ -111,7 +152,7 @@ namespace MielsJimmyScrumProject.Controllers
                 board.UpdatedBy = User.Identity.Name;
 
                 
-                var response = _BoardRepository.Update(board);
+                var response = _boardRepository.Update(board);
 
                 if (response != null & response.Id != 0)
                 {
@@ -124,24 +165,46 @@ namespace MielsJimmyScrumProject.Controllers
 
 
         [HttpGet]
-        public IActionResult Delete(int id)
+        [Authorize(Roles = "SuperAdmin, Admin")]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var board = _BoardRepository.GetById(id);
+            var board = _boardRepository.GetById(id);
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var IsSuperAdmin = User.IsInRole("SuperAdmin");
 
-            return View(board);
+
+            if (board == null || board.IsDeleted == true)
+            {
+                Response.StatusCode = 404;
+                return View("BoardNotFound", id);
+            }
+            else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId) { 
+                return View(board);
+        
+        }
+            return View("NotAuthorized");
         }
 
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public IActionResult DeleteSure(int id)
         {
-            var board = _BoardRepository.GetById(id);
+            var board = _boardRepository.GetById(id);
 
             board.IsDeleted = true;
+            board.UpdatedBy = User.Identity.Name;
+            board.UpdatedDate = DateTime.Now;
 
-            var response = _BoardRepository.Delete(board);
+            var response = _boardRepository.Delete(board);
 
             if (response != null && response.Id != 0)
             {
                 var TasksinDeletedBoard = _taskRepository.GetAllTasksofBoard(id).ToList();
+                var UserAssignedtoBoard = board.BoardUsers.ToList();
+
+                foreach (var user in UserAssignedtoBoard)
+                {
+                    _boardRepository.RemoveBoardUser(user);
+                }
 
                 foreach (var tasks in TasksinDeletedBoard)
                 {
@@ -156,33 +219,56 @@ namespace MielsJimmyScrumProject.Controllers
 
             return View(board);
         }
-
-        public IActionResult BoardsList()
+        [HttpGet]
+        public async Task<IActionResult> BoardsListAsync()
         {
-            var boardList = _BoardRepository.GetAllBoards();
-            return View(boardList);
-        }
+            
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+            try
+            {
+                if (IsSuperAdmin)
+                {
+                    var boardList = _boardRepository.GetAllBoards();
+                    return View(boardList);
+                }
+                else
+                {
+                    var boardList = _boardRepository.GetAllBoards().Where(x => x.CompanyId == currentuser.CompanyId);
+                    return View(boardList);
+                }
+            }
+            catch (Exception ex )
+            {
+
+                return View("error", ex);
+            }
+          
+            }
+        
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public IActionResult AssignUsers(int boardId)
         {
             ViewBag.boardId = boardId;
             // send the boardid via viewbag since we cannot retrieve the boardid via the list given to the model.
 
-            var board = _BoardRepository.GetById(boardId);
+            var board = _boardRepository.GetById(boardId);
 
-            if (board == null)
+            if (board == null || board.IsDeleted == true)
             {
-                //return RedirectToAction("HttpStatusCodeHandler", "ErrorController");
+                Response.StatusCode = 404;
+                return View("BoardNotFound", boardId);
             }
 
 
             var model = new List<AssignUsersViewModel>();
-            var userList = _CompanyRepository.GetAllCompanyUsers(board.CompanyId).ToList();
+            var userList = _companyRepository.GetAllCompanyUsers(board.CompanyId).ToList();
 
             foreach (var user in userList)
             {
-                var IsAssigned = _BoardRepository.FindBoardUser(boardId, user.Id);
+                var IsAssigned = _boardRepository.FindBoardUser(boardId, user.Id);
                 var AssignUserModel = new AssignUsersViewModel()
                 {
                     UserId = user.Id,
@@ -197,20 +283,22 @@ namespace MielsJimmyScrumProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> AssignUsersAsync(List<AssignUsersViewModel> model, int boardId)
         {
-            var board = _BoardRepository.GetById(boardId);
+            var board = _boardRepository.GetById(boardId);
 
-            if (board == null)
+            if (board == null || board.IsDeleted == true)
             {
-                //return RedirectToAction("HttpStatusCodeHandler", "ErrorController");
+                Response.StatusCode = 404;
+                return View("BoardNotFound", boardId);
             }
 
             for (int i = 0; i < model.Count(); i++)
             {
-                var user = await _UserManager.FindByIdAsync(model[i].UserId);
-                var Exists = _BoardRepository.FindBoardUser(boardId, user.Id);
-                var ExistingBoardUser = _BoardRepository.FindBoardUserById(boardId, user.Id);
+                var user = await _userManager.FindByIdAsync(model[i].UserId);
+                var Exists = _boardRepository.FindBoardUser(boardId, user.Id);
+                var ExistingBoardUser = _boardRepository.FindBoardUserById(boardId, user.Id);
                 BoardUser boardsuser = new BoardUser
                 {
                     BoardId = boardId,
@@ -221,12 +309,12 @@ namespace MielsJimmyScrumProject.Controllers
 
                 if (model[i].IsSelected && Exists.Equals(false))
                 {
-                    _BoardRepository.AssignBoardUser(boardsuser);
+                    _boardRepository.AssignBoardUser(boardsuser);
 
                 }
                 else if (!model[i].IsSelected && Exists.Equals(true))
                 {
-                    _BoardRepository.RemoveBoardUser(ExistingBoardUser);
+                    _boardRepository.RemoveBoardUser(ExistingBoardUser);
                 }
               
             }
@@ -235,5 +323,6 @@ namespace MielsJimmyScrumProject.Controllers
         }
     }
 
-
+    //TODO when removing a User to Board the entry in Join table needs to be also removed !
+    //When calling up the boardusers , the users who are Isdeleted == True need to be exlucuded.
 }

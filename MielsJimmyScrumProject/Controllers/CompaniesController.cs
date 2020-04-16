@@ -64,7 +64,7 @@ namespace MielsJimmyScrumProject.Controllers
                 if (model.Photo != null)
                 {
                     model.CreatedDate = DateTime.Now;
-                    model.CreatedBy = User.Identity.Name;
+                    model.CreatedBy = User.Identity.Name; 
                     model.PhotoPath = ProcessUploadFile(model);
                 }
 
@@ -194,7 +194,7 @@ namespace MielsJimmyScrumProject.Controllers
             var company = _companyRepository.GetById(id);
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
             var IsSuperAdmin = User.IsInRole("SuperAdmin");
-            if (company == null)
+            if (company == null || company.IsDeleted == true)
             {
                 Response.StatusCode = 404;
                 return View("CompanyNotFound", id);

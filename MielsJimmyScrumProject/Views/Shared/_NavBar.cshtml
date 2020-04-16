@@ -23,7 +23,6 @@
 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" asp-action="CompanyList" asp-controller="Companies">List Companies</a>
-                        <a class="dropdown-item" asp-action="Create" asp-controller="Companies">Create</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -63,7 +62,7 @@
 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" asp-action="BoardsList" asp-controller="Boards">List Boards</a>
-                        <a class="dropdown-item" asp-action="Create" asp-controller="Boards">Create</a>
+
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -74,6 +73,35 @@
 
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" asp-action="ListUsers" asp-controller="Administration"> Manage company Users</a>
+
+                    </div>
+                </li>
+            }
+            @if (signInManager.IsSignedIn(User) && User.IsInRole("User"))
+            {
+                <li class="nav-item active">
+                    <a class="nav-link" asp-action="UserIndex" asp-controller="Home">Home <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                       My Boards
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" asp-action="BoardsList" asp-controller="Boards">List of Boards</a>
+
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        My Tasks
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" asp-action="UserTasklist" asp-controller="tasks"> List of My tasks</a>
 
                     </div>
                 </li>

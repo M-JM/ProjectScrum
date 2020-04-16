@@ -62,7 +62,7 @@ namespace MielsJimmyScrumProject.Controllers
                 // If user is successfully created
                 if (result.Succeeded)
                 {
-                  return RedirectToAction("AdminIndex","Home");
+                  return RedirectToAction("ListUsers","Administration");
                     }
                 // If there are any errors, add them to the ModelState object
                 // which will be displayed by the validation summary tag helper
@@ -73,7 +73,7 @@ namespace MielsJimmyScrumProject.Controllers
             }
             return View(model);
         }
-            return View(model); // global expection
+            return View("Error"); // global expection
         }
 
         [HttpPost]
@@ -123,8 +123,8 @@ namespace MielsJimmyScrumProject.Controllers
 
 
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginAsync(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)

@@ -12,7 +12,7 @@ using MielsJimmyScrumProjectDAL.Models;
 
 namespace MielsJimmyScrumProject.Controllers
 {
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    // [Authorize(Roles = "SuperAdmin,Admin")]
     public class AdministrationController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -23,13 +23,13 @@ namespace MielsJimmyScrumProject.Controllers
             _roleManager = roleManager;
             _userManager = userManager;
         }
-        [Authorize(Roles = "SuperAdmin")]
+        //  [Authorize(Roles = "SuperAdmin")]
         [HttpGet]
         public IActionResult CreateRole()
         {
             return View();
         }
-        [Authorize(Roles = "SuperAdmin")]
+        //  [Authorize(Roles = "SuperAdmin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRole(CreateRoleViewModel model)
@@ -73,7 +73,7 @@ namespace MielsJimmyScrumProject.Controllers
                       
             return View(users);
         }
-        [Authorize(Roles = "SuperAdmin")]
+        // [Authorize(Roles = "SuperAdmin")]
         [HttpGet]
         public IActionResult ListRoles()
         {

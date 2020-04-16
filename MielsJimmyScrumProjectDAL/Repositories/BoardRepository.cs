@@ -84,19 +84,23 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         public IEnumerable<Board> GetAllBoards()
         {
-            var listBoards = _context.Boards;
+            var listBoards = _context.Boards.Include( x => x.BoardUsers).Where( x => x.IsDeleted == false);
             return listBoards;
         }
 
-        public IEnumerable<Board> GetAllBoardsfromcompany(int id)
+        public IEnumerable<Board> GetAllBoardsfromcompany(int? id)
         {
-            var listBoardsOfCompany = _context.Boards.Include(x => x.BoardTasks).Include(x => x.BoardUsers).Where(x => x.CompanyId == id && x.IsDeleted == false);
+            var listBoardsOfCompany = _context.Boards
+                .Include(x => x.BoardTasks).Where(u => u.IsDeleted == false)
+                .Include(x => x.BoardUsers).Where(x => x.CompanyId == id && x.IsDeleted == false);
+                //.Include(x => x.BoardUsers.All(x => x.ApplicationUser.IsDeleted == false);
+            
             return listBoardsOfCompany;
         }
 
         public Board GetById(int id)
         {
-            var board = _context.Boards.Include(x => x.BoardUsers).FirstOrDefault(x => x.Id == id);
+            var board = _context.Boards.Include(x => x.BoardUsers).FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
             return board;
         }
 
@@ -214,7 +218,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
                         if (affectedRows > 0)
                         {
-                            _logger.LogInformation($"The {boardUser.ApplicationUser} was removed to {boardUser.Board.Name}.");
+                            _logger.LogInformation($"The {boardUser.ApplicationUser} was removed from {boardUser.Board.Name}.");
                             return removeBoardUserEntityEntry.Entity;
                         }
                     }

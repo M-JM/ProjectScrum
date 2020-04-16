@@ -11,7 +11,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         IEnumerable<Board> GetAllBoards();
 
-        IEnumerable<Board> GetAllBoardsfromcompany(int id);
+        IEnumerable<Board> GetAllBoardsfromcompany(int? id);
 
         // CREATE
 

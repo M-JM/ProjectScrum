@@ -1,0 +1,185 @@
+﻿@model UserTaskListViewModel
+@inject UserManager<ApplicationUser> userManager;
+
+@{
+    ViewData["Title"] = "Index";
+    var user = await userManager.GetUserAsync(Context.User);
+}
+
+<div class="row justify-content-center m-3">
+    <table class="table table-striped bg-light text-center">
+
+        @foreach (var Board in Model.Boards)
+        {
+            <thead class="collapsible">
+                <tr >
+
+                    <th scope="col">@Board.Id</th>
+                    <th scope="col">@Board.Name</th>
+
+                </tr>
+
+                <tr>
+                    <th scope="col">Todo</th>
+                    <th scope="col">Done </th>
+                    <th scope="col">Doing </th>
+                </tr>
+
+                @*<button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Collapsible Group Item #1
+                                </button>
+                                </h5>
+                    </div>
+
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                        <div class="card-body">*@
+
+            </thead>
+            <tbody align="center" class="content">
+                <tr>
+                    <td>
+                       
+                            <table>
+
+                                <tbody align="center">
+                                    @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo))
+                                    {
+                                        <tr align="center">
+
+                                            <td align="center">
+
+                                                <div class="card-body text-center ">
+
+                                                    <div class="card mb-2 text-white bg-dark ">
+                                                        <div class="card-header">
+                                                            <strong>
+                                                                @task.Title
+                                                            </strong>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <p class="card-text">
+                                                                @task.Description
+                                                            </p>
+                                                            <div class="card-body ">
+                                                                <p class="card-text ">
+                                                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                      
+                    </td>
+                    <td class="text-center">
+                        <table align="center">
+
+                            @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Doing))
+                            {
+
+                                <tr class="text-center">
+
+                                    <td class="text-center">
+                                        <div class="card-body text-center ">
+
+                                            <div class="card mb-2 text-white bg-dark text-center">
+                                                <div class="card-header">
+                                                    <strong>
+                                                        @task.Title
+                                                    </strong>
+                                                </div>
+                                                <div class="card-body text-center">
+                                                    <p class="card-text">
+                                                        @task.Description
+                                                    </p>
+                                                    <div class="card-body text-center">
+                                                        <p class="card-text ">
+                                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+
+                        </table>
+                    </td>
+                    <td class="text-center">
+                        <table align="center">
+
+                            @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Done))
+                            {
+                                <tr class="text-center">
+
+                                    <td class="text-center">
+                                        <div class="card-body text-center ">
+
+                                            <div class="card mb-2 text-white bg-dark text-center">
+                                                <div class="card-header">
+                                                    <strong>
+                                                        @task.Title
+                                                    </strong>
+                                                </div>
+                                                <div class="card-body text-center">
+                                                    <p class="card-text">
+                                                        @task.Description
+                                                    </p>
+                                                    <div class="card-body text-center">
+                                                        <p class="card-text ">
+                                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+
+                        </table>
+                    </td>
+                </tr>
+
+
+
+            </tbody>
+        }
+
+    </table>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
+    </script>
+}
+@*@section Styles {
+    <link href="~/css/Toggler.css" rel="stylesheet" asp-append-version="true" />
+}*@

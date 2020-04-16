@@ -1,6 +1,6 @@
 ﻿@model AdminIndexViewModel
 @{
-    ViewData["Title"] = "Admin Landing Page";
+    ViewData["Title"] = "User Landing Page";
     var company = Model.company;
     var photoPath = $"~/Images/{company.PhotoPath ?? "noimage.png"}";
 }
@@ -20,11 +20,9 @@
                 <h4>Created By: @company.CreatedBy</h4>
                 <h4>Created Date: @company.CreatedDate</h4>
             </div>
-         
+
             <div class="card-footer text-center">
-                <a asp-action="Create" asp-controller="Boards" asp-route-companyid="@company.Id" class="btn btn-success">Create new board</a>
-                <a asp-action="Update" asp-controller="Companies" asp-route-id="@company.Id" class="btn btn-warning">Edit</a>
-                <a asp-action="Delete" asp-controller="Companies" asp-route-id="@company.Id" class="btn btn-danger">Delete</a>
+  
             </div>
         </div>
     </div>
@@ -48,7 +46,7 @@
 
                     <td>@board.Id</td>
                     <td>@board.Name</td>
-                    @if (board.BoardUsers != null && board.BoardUsers.Count() != 0 )
+                    @if (board.BoardUsers != null && board.BoardUsers.Count() != 0)
                     {
                         <td>@board.BoardUsers.Count() </td>
                     }
@@ -56,12 +54,12 @@
                     {
                         <td> No Users Assigned</td>
                     }
-                <td>
-                         
-                    <a asp-action="Details" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-success">View Details</a>
-                
+                    <td>
 
-                </td>
+                        <a asp-action="Details" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-success">View Details</a>
+
+
+                    </td>
 
                 </tr>
             }
@@ -69,4 +67,4 @@
         </tbody>
 
     </table>
-    </div>
+</div>

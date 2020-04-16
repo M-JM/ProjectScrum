@@ -126,13 +126,13 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         public IEnumerable<ApplicationUser> GetAllCompanyUsers(int id)
         {
-            var companyUsers = _context.Users.AsNoTracking().Include(x => x.BoardUser).Where(e => e.CompanyId == id);
+            var companyUsers = _context.Users.Include(x => x.BoardUser).Where(e => e.CompanyId == id && e.IsDeleted == false);
             return companyUsers;
         }
 
         public IEnumerable<ApplicationUser> GetAllUsersfromCompany(int id)
         {
-            var companyUsers = _context.Users.Where(e => e.CompanyId == id || e.CompanyId == null);
+            var companyUsers = _context.Users.Where(e => e.CompanyId == id && e.IsDeleted == false || e.CompanyId == null);
             return companyUsers;
         }
     }

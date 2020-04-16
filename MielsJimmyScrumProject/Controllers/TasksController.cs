@@ -164,8 +164,7 @@ namespace MielsJimmyScrumProject.Controllers
             return View(task);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+  
         public IActionResult DeleteSure(int taskid)
         {
             var task = _taskRepository.GetById(taskid);
@@ -184,6 +183,30 @@ namespace MielsJimmyScrumProject.Controllers
             return View(task);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UserTasklistAsync()
+         {
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var test = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).ToList();
+            //var boards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.Any(x => x.ApplicationUser == currentuser)).ToList();
+            //var boards2 = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.FindAll(x.BoardUsers.ApplicationUser.Id == currentuser.Id)).ToList();
+
+            var query = from board in test
+                        where board.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id)
+                        select board;
+
+            var Test2 = test.Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id)).ToList();
+
+            var tasksDoing = Test2.Where(x => x.BoardTasks.Any(x => x.Status == ScrumTaskStatus.Doing)).ToList();
+
+            var userTaskListViewModel = new UserTaskListViewModel
+            {
+               Boards = query.ToList()
+               // Boards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.All(x => x.ApplicationUser != currentuser)).ToList()
+            };
     
+            return View(userTaskListViewModel);
     }
+
+}
 }
