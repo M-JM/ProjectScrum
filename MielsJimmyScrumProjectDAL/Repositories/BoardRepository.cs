@@ -84,15 +84,17 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         public IEnumerable<Board> GetAllBoards()
         {
-            var listBoards = _context.Boards.Include( x => x.BoardUsers).Where( x => x.IsDeleted == false);
+            var listBoards = _context.Boards.Include( x => x.BoardUsers).Where( x => x.IsDeleted == false).Include(x => x.BoardTasks);
             return listBoards;
         }
 
         public IEnumerable<Board> GetAllBoardsfromcompany(int? id)
         {
             var listBoardsOfCompany = _context.Boards
-                .Include(x => x.BoardTasks).Where(u => u.IsDeleted == false)
-                .Include(x => x.BoardUsers).Where(x => x.CompanyId == id && x.IsDeleted == false);
+                .Include(x => x.BoardTasks)
+                .Where(u => u.IsDeleted == false)
+                .Include(x => x.BoardUsers)
+                .Where(x => x.CompanyId == id && x.IsDeleted == false);
                 //.Include(x => x.BoardUsers.All(x => x.ApplicationUser.IsDeleted == false);
             
             return listBoardsOfCompany;

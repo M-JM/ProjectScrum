@@ -303,6 +303,8 @@ namespace MielsJimmyScrumProject.Controllers
             user.UpdatedDate = DateTime.Now;
             user.UpdatedBy = User.Identity.Name;
 
+            // delete related record in boarduser
+
             var identityResult = await _userManager.UpdateAsync(user);
 
             if (identityResult.Succeeded)

@@ -224,17 +224,26 @@ namespace MielsJimmyScrumProject.Controllers
         {
             
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+          
             try
             {
-                if (IsSuperAdmin)
+                if (User.IsInRole("SuperAdmin"))
                 {
                     var boardList = _boardRepository.GetAllBoards();
                     return View(boardList);
                 }
-                else
+                else if (User.IsInRole("Admin"))
                 {
                     var boardList = _boardRepository.GetAllBoards().Where(x => x.CompanyId == currentuser.CompanyId);
+                  
+                    return View(boardList);
+                }
+                else
+                {
+                    var boardList = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId)
+                        .Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id))
+                        .ToList();
+
                     return View(boardList);
                 }
             }

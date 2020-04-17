@@ -13,7 +13,17 @@ namespace MielsJimmyScrumProjectDAL.Models
 
         [ForeignKey("Board")]
         public int BoardId { get; set; }
-        
+
+        public bool IsDeleted { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime UpdatedDate { get; set; }
+
+        public string CreatedBy { get; set; }
+
+        public string UpdatedBy { get; set; }
+
         public virtual Board Board { get; set; }
 
         public virtual ApplicationUser ApplicationUser { get; set; }

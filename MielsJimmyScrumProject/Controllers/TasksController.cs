@@ -201,7 +201,7 @@ namespace MielsJimmyScrumProject.Controllers
 
             var userTaskListViewModel = new UserTaskListViewModel
             {
-               Boards = query.ToList()
+               Boards = Test2.ToList()
                // Boards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.All(x => x.ApplicationUser != currentuser)).ToList()
             };
     
