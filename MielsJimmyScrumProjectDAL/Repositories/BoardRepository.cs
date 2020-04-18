@@ -102,8 +102,28 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         public Board GetById(int id)
         {
-            var board = _context.Boards.Include(x => x.BoardUsers).FirstOrDefault(x => x.Id == id && x.IsDeleted == false);
+
+            // board met bepaald ID en boardusers maar virtual applicationuser is null
+            var board = _context.Boards
+                .Include(x => x.BoardUsers)
+                .Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();               
+
             return board;
+        }
+
+        public IEnumerable<BoardUser> GetUsersofBoard(int id)
+        {
+                        
+            var test = _context.BoardUsers.Include(x => x.ApplicationUser)
+                .Where(x => x.BoardId == id && x.IsDeleted == false).ToList();
+
+            //var NEWTEST = _context.BoardUsers
+            //    .Include(x => x.ApplicationUser)
+            //    .Include(x => x.Board)
+            //    .Where(x => x.BoardId == id && x.IsDeleted == false && x.ApplicationUser.IsDeleted == false).ToList();
+
+
+            return test;
         }
 
         public Board Update(Board board)
@@ -196,9 +216,9 @@ namespace MielsJimmyScrumProjectDAL.Repositories
             }
         }
 
-        public bool FindBoardUser(int boardid , string userid)
+        public BoardUser FindBoardUser(int boardid , string userid)
         {
-            bool exists = _context.BoardUsers.AsNoTracking().Any(x => x.BoardId == boardid && x.ApplicationUserId == userid);
+            var exists = _context.BoardUsers.FirstOrDefault(x => x.BoardId == boardid && x.ApplicationUserId == userid);
 
             return exists;
         }
@@ -210,17 +230,17 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
                 {
                     
-                    var removeBoardUserEntityEntry = _context.BoardUsers.Remove(boardUser);
+                    var removeBoardUserEntityEntry = _context.BoardUsers.Update(boardUser);
 
                     if (removeBoardUserEntityEntry != null &&
-                        removeBoardUserEntityEntry.State == EntityState.Deleted)
+                        removeBoardUserEntityEntry.State == EntityState.Modified)
                     {
 
                         var affectedRows = _context.SaveChanges();
 
                         if (affectedRows > 0)
                         {
-                            _logger.LogInformation($"The {boardUser.ApplicationUser} was removed from {boardUser.Board.Name}.");
+                            _logger.LogInformation($"The {boardUser.ApplicationUser} was set to false from {boardUser.Board.Name}.");
                             return removeBoardUserEntityEntry.Entity;
                         }
                     }
@@ -230,7 +250,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"When adding user to board.");
+                _logger.LogError(ex, $"When setting user to false from {boardUser.Board.Name}.");
                 throw;
             }
         }

@@ -20,13 +20,6 @@ namespace MielsJimmyScrumProjectDAL.Context
            .HasKey(c => new { c.BoardId, c.ApplicationUserId });
 
 
-
-            //public DbSet<BoardTask> Tasks { get; set; }
-
-
-
-
-
             ApplicationUser SuperAdmin = new ApplicationUser()
             {
                 CompanyId = null,
@@ -264,17 +257,20 @@ namespace MielsJimmyScrumProjectDAL.Context
                 new IdentityRole()
                 {
                     Id = "9d17f4e4-1a9e-439b-a88d-6e994a990fe7",
-                    Name = "SuperAdmin"
+                    Name = "SuperAdmin",
+                    NormalizedName="SUPERADMIN"
                 },
                 new IdentityRole()
                 {
                     Id = "b4e5c024-99c5-43b1-847f-26585777f463",
-                    Name = "Admin"
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
                 },
                 new IdentityRole()
                 {
                     Id = "fb4302cf-f521-4fa9-b20a-0d4e59b703a5",
-                    Name = "User"
+                    Name = "User",
+                    NormalizedName ="USER"
 
                 }
                 );

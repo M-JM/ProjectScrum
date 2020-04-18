@@ -194,6 +194,7 @@ namespace MielsJimmyScrumProject.Controllers
             var company = _companyRepository.GetById(id);
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
             var IsSuperAdmin = User.IsInRole("SuperAdmin");
+
             if (company == null || company.IsDeleted == true)
             {
                 Response.StatusCode = 404;
@@ -201,8 +202,7 @@ namespace MielsJimmyScrumProject.Controllers
             }
             else if (IsSuperAdmin || company.Id == currentuser.CompanyId)
             {
-
-                return View(company);
+            return View(company);
             }
             return View("Error");
         }

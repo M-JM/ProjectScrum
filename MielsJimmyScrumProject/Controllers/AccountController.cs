@@ -35,6 +35,13 @@ namespace MielsJimmyScrumProject.Controllers
             return View();
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminRegister(RegisterViewModel model)

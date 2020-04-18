@@ -5,6 +5,7 @@
     ViewData["Title"] = "Index";
     var user = await userManager.GetUserAsync(Context.User);
 }
+@if(Model.Boards != null) { 
 
 @foreach (var Board in Model.Boards)
 {
@@ -150,6 +151,10 @@
     </div>
 }
 
+
+    <p> No Boards assigned to you </p>
+
+}
 
 @section Scripts {
     <script>

@@ -7,15 +7,20 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 {
     public interface IBoardRepository
     {
+
+        // READ
         Board GetById(int id);
 
         IEnumerable<Board> GetAllBoards();
 
         IEnumerable<Board> GetAllBoardsfromcompany(int? id);
 
+        IEnumerable<BoardUser> GetUsersofBoard(int id);
+
         // CREATE
 
         Board Create(Board board);
+
         BoardUser AssignBoardUser(BoardUser boardUser);
 
         // SOFT DELETE
@@ -29,7 +34,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
         Board Update(Board board);
         BoardUser UpdateBoardUser(BoardUser boardUser);
 
-        bool FindBoardUser(int boardid, string userid);
+        BoardUser FindBoardUser(int boardid, string userid);
 
         BoardUser FindBoardUserById(int boardid, string userid);
 

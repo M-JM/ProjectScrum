@@ -40,11 +40,11 @@ namespace MielsJimmyScrumProject.Controllers
                     ErrorMessages.Qs = statusCodeResult.OriginalQueryString;
                     _logger.LogWarning($"404 Error Occured. Path = {statusCodeResult.OriginalPath} " +
                         $"and QueryString = {statusCodeResult.OriginalQueryString}");
-
+                    
                     break;
             }
 
-            return View("NotFound", ErrorMessages);
+             return View("NotFound", ErrorMessages);
         }
         [HttpGet]
         [AllowAnonymous]

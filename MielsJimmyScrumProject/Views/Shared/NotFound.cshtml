@@ -6,33 +6,39 @@
 }
 
 
-<div class="container" style="background-color:rgb(0, 148, 255)">
-    <div class="text-center align-content-center">
-        <h3>
-            PAGE 404 - The page does not exist
-        </h3>
-    </div>
 
-    <div> <a asp-controller="Home" asp-action="index" class="btn btn-info m-1 align-content-center">Click here to Navigate to Home Page</a></div>
-
-    <div class="align-content-center">
-        <h3>Page Details:</h3>
-        <div class="alert alert-dark">
-            <h5>Error Message</h5>
-            <hr />
-            <p>@Model.TheErrorMessage</p>
-        </div>
-
-        <div class="alert alert-dark">
-            <h5>Path</h5>
-            <hr />
-            <p>@Model.Path</p>
-        </div>
-
-        <div class="alert alert-dark">
-            <h5>Qs</h5>
-            <hr />
-            <p>@Model.Qs</p>
+<div class="container-md perfect-centering">
+    <div class="row text-center">
+        <div class="col-lg-6 offset-lg-3 col-md-6 offset-md-3 col-12 p-3 error-main">
+            <div class="row">
+                <div class="col-lg-10 col-12 col-sm-10 offset-sm-1 offset-sm-1">
+                    <img src="~/images/PageNotFound.png" style="height:400px;width:100%;" class="m-0" />
+                    
+                    <h4 class="m-2">This page does not exist</h4>
+                                        
+                 
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-success m-2">Back to overview</a>
+                        }
+                        @if (User.IsInRole("User"))
+                        {
+                            <a asp-action="UserIndex" asp-controller="Home" class="btn btn-success m-2">Back to overview</a>
+                        }
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                            <a asp-action="UserIndex" asp-controller="Home" class="btn btn-success m-2">Back to overview</a>
+                        }
+                    
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+
+@*Design from taken from = https://www.nicesnippets.com/snippet/bootstrap-4-page-not-found-404-error-page-design*@
+
+@section Styles {
+    <link href="~/css/Error.css" rel="stylesheet" asp-append-version="true" />
+}

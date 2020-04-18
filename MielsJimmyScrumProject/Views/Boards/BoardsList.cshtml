@@ -28,7 +28,7 @@
         <tbody class="">
             @foreach (var board in Model)
             {
-                @if (User.IsInRole("Admin"))
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
                 {
                     <tr>
 

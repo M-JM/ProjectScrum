@@ -1,7 +1,8 @@
 ﻿@model TaskCreateViewModel
-
+@inject UserManager<ApplicationUser> userManager;
 @{
     ViewData["Title"] = "Create";
+    var currentUser = await userManager.GetUserAsync(Context.User);
 }
 
 <h1>Create</h1>
@@ -10,10 +11,11 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <input type="hidden" asp-for="ApplicationUser" />
+
         <form asp-action="Create" asp-controller="Tasks" method="post" class="mt-3">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="BoardId" />
+            <input type="hidden" asp-for="CompanyId" />
 
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -35,11 +37,36 @@
                 </div>
             </div>
 
+            @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Assign User to Task</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+
+                            @foreach (var user in Model.AvailableUsers)
+                            {
+                                <li>
+                                    <input type="radio" asp-for="Userid" value="@Model.Userid">
+                                    <label>@user.ApplicationUser.UserName </label>
+
+
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="Userid" value="@currentUser.Id">
+            }
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-
-
         </form>
     </div>
 </div>
