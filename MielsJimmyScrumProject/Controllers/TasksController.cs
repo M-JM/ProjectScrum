@@ -18,12 +18,14 @@ namespace MielsJimmyScrumProject.Controllers
         private readonly ITaskRepository _taskRepository;
         private readonly IBoardRepository _boardRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        
 
         public TasksController(ITaskRepository taskRepository, IBoardRepository boardRepository, UserManager<ApplicationUser> userManager)
         {
             _taskRepository = taskRepository;
             _boardRepository = boardRepository;
             _userManager = userManager;
+            
         }
 
 
@@ -105,7 +107,7 @@ namespace MielsJimmyScrumProject.Controllers
             {                   
                 var detailViewModel = new TaskEditViewModel()
             {
-                
+                Board = task.Board,
                 Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
@@ -113,6 +115,7 @@ namespace MielsJimmyScrumProject.Controllers
                 CreatedBy = task.CreatedBy,
                 CreatedDate =task.CreatedDate,
                 BoardId = task.BoardId,
+                AssginedUser = task.ApplicationUser.UserName
                 
             };
             return View(detailViewModel);
@@ -160,6 +163,7 @@ namespace MielsJimmyScrumProject.Controllers
         {
             var task = _taskRepository.GetById(taskid);
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var BoardUser = _boardRepository.GetUsersofBoard(task.BoardId).ToList();
 
             if (task == null || task.IsDeleted == true)
             {
@@ -180,8 +184,11 @@ namespace MielsJimmyScrumProject.Controllers
                 Description = task.Description,
                 Status = task.Status,
                 UpdatedBy = User.Identity.Name,
-                UpdatedDate = DateTime.Now
-             };
+                UpdatedDate = DateTime.Now,
+                AvailableUsers = BoardUser,
+                AssginedUser = task.ApplicationUser.UserName
+                
+                };
 
             return View(taskEditViewModel);
         }
@@ -215,6 +222,7 @@ namespace MielsJimmyScrumProject.Controllers
                 task.Status = editModel.Status;
                 task.UpdatedDate = DateTime.Now;
                 task.UpdatedBy = User.Identity.Name;
+                task.Userid = editModel.Userid;
 
 
                 var response = _taskRepository.Update(task);

@@ -9,18 +9,19 @@
 <div class="row justify-content-center m-3">
     <div class="col-sm-8">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header text-center">
                 <h1>@Model.Title</h1>
             </div>
 
             <div class="card-body text-center">
 
-
+                <h3>Board Name: @Model.Board.Name</h3>
                 <h4>Task ID: @Model.Id</h4>
                 <h4>Task Description: @Model.Description</h4>
                 <h4>Task Status : @Model.Status</h4>
                 <h4>Created By: @Model.CreatedBy</h4>
                 <h4>Created Date: @Model.CreatedDate</h4>
+                <h4>Assigned to : @Model.AssginedUser</h4>
             </div>
 
             <div class="card-footer text-center">

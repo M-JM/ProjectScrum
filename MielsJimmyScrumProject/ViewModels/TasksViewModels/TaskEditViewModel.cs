@@ -8,5 +8,6 @@ namespace MielsJimmyScrumProject.ViewModels.TasksViewModels
 {
     public class TaskEditViewModel : TaskCreateViewModel
     {
-       }
+        public string AssginedUser { get; set; }
+    }
 }

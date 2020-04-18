@@ -112,7 +112,9 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         public BoardTask GetById(int id)
         {
-            var task = _context.Tasks.Include(x => x.Board).FirstOrDefault(x => x.Id == id);
+            var task = _context.Tasks.Include(x => x.Board)
+                .Include(x => x.ApplicationUser)
+                .FirstOrDefault(x => x.Id == id);
             return task;
         }
 
