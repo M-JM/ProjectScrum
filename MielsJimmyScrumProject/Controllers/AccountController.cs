@@ -130,7 +130,6 @@ namespace MielsJimmyScrumProject.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> LoginAsync(LoginViewModel model, string returnUrl)
         {
@@ -158,18 +157,21 @@ namespace MielsJimmyScrumProject.Controllers
                     {
                         return RedirectToAction("SuperAdminIndex","Home");
                     }
-                    if(currentuser.IsDeleted == false)
+                   else if(currentuser.IsDeleted == false)
                     {
                         return RedirectToAction("Index", "Home");
                     }
+                    else { 
                     ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
                     return View();
+                    }
                 }
-               
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-            }
+                return View();
 
-            return View();
+            }
+            ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+            return View(model);
         }
 
         [HttpPost]

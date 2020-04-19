@@ -2,12 +2,12 @@
 @{
     ViewBag.Title = "Company List";
 }
-<div class="card-deck">
+<div class="card-deck mt-3">
     @foreach (var company in Model)
     {
         var photoPath = $"~/Images/{company.PhotoPath ?? "noimage.png"}";
 
-        <div class="card m-3" style="min-width: 18rem; max-width: 30.5%;">
+        <div class="card m-2" style="width: 9rem;">
             <img src="@photoPath" asp-append-version="true" class="card-img-top" style="height:200px;width:auto;" alt="NoImage" />
             <div class="card-header">
                 <h3>@company.Name</h3>

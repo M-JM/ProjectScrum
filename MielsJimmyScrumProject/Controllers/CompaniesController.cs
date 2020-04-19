@@ -140,10 +140,18 @@ namespace MielsJimmyScrumProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(CompanyEditViewModel editModel)
+        public async Task<IActionResult> UpdateAsync(CompanyEditViewModel editModel)
         {
-         
-            if(ModelState.IsValid)
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            if (editModel.IsDeleted == true)
+            {
+                Response.StatusCode = 404;
+                return View("CompanyNotFound", editModel.Id);
+            }
+            else if (User.IsInRole("SuperAdmin") || editModel.Id == currentuser.CompanyId)
+            {
+
+                if (ModelState.IsValid)
             {
                 var company = _companyRepository.GetById(editModel.Id);
 
@@ -166,7 +174,8 @@ namespace MielsJimmyScrumProject.Controllers
 
             return View();
 
-          
+            }
+            return View("NotAuthorized");
         }
         //TODO implement error view
         [HttpGet]
