@@ -83,7 +83,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
         }
         public IEnumerable<Company> GetAllCompanies()
         {
-            var listCompanies = _context.Companies;
+            var listCompanies = _context.Companies.Include(x => x.Employees);
             return listCompanies;
         }
 

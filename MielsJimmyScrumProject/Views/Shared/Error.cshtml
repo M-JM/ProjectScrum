@@ -1,33 +1,51 @@
 ﻿@model ExceptionDetail
 
-<div class="container" style="background-color:rgb(0, 148, 255)">
-    <div class="text-center align-content-center">
-        <h3>
-         
-        </h3>
-        <h3>  </h3>
-        <img src="~/images/spagett.jpg" />
-        <h4>Please contact the site administration at zfzfzf@gmail.com </h4>
-    </div>
 
-    <h3>Exception Details:</h3>
-    <div class="alert alert-danger">
-        <h5>Exception Path</h5>
-        <hr />
-        <p>@Model.ExceptionPath</p>
-    </div>
+@{
+    ViewBag.Title = "Something went wrong";
+}
 
-    <div class="alert alert-danger">
-        <h5>Exception Message</h5>
-        <hr />
-        <p>@Model.ExceptionMessage</p>
-    </div>
 
-    <div class="alert alert-danger">
-        <h5>Exception Stack Trace</h5>
-        <hr />
-        <p>@Model.Stacktrace</p>
+<div class="container-lg perfect-centering">
+    <div class="row text-center">
+        <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-1 col-12 p-3 error-main">
+            <div class="row">
+                <div class="col-lg-10 col-12 col-sm-12 offset-sm-1 offset-sm-1">
+                    <img src="~/images/Broken.jpg" style="height:auto;width:100%;" class="m-0" />
+                   
+                    <h4 class="mt-2 bt-2">Something went wrong , please contact us at test@test.com </h4>
+                    <h5 class="mt-2 bt-2">Exception Details:</h5>
+                    <div class="alert alert-danger mt-2 bt-2">
+                        <h5>Exception Path</h5>
+                        <hr />
+                        <p>@Model.ExceptionPath</p>
+                    </div>
+
+                    <div class="alert alert-danger mt-2 bt-2">
+                        <h5>Exception Message</h5>
+                        <hr />
+                        <p>@Model.ExceptionMessage</p>
+                    </div>
+                    <h6>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-success">Back to overview</a>
+                        }
+                        else if (User.IsInRole("User"))
+                        {
+                            <a asp-action="UserIndex" asp-controller="Home" class="btn btn-success">Back to overview</a>
+                        }
+                    </h6>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 
+@*Design from taken from = https://www.nicesnippets.com/snippet/bootstrap-4-page-not-found-404-error-page-design*@
+
+@section Styles {
+    <link href="~/css/Error.css" rel="stylesheet" asp-append-version="true" />
+}

@@ -29,7 +29,7 @@ namespace MielsJimmyScrumProject.Controllers
         public IActionResult Index()
         {
       
-            
+                        
             if(User.IsInRole("Admin"))
 
             { return RedirectToAction("AdminIndex"); }
@@ -46,13 +46,24 @@ namespace MielsJimmyScrumProject.Controllers
 
             return View();
         }
+
         [Authorize(Roles = "SuperAdmin")]
+        [HttpGet]
         public IActionResult SuperAdminIndex()
         {
-            return View();
+            var SuperAdminmodel = new SuperAdminIndexViewModel();
+            {
+                SuperAdminmodel.boards = _boardRepository.GetAllBoards().ToList();
+                SuperAdminmodel.Companies = _companyRepository.GetAllCompanies().ToList();
+                SuperAdminmodel.Users = _userManager.Users.Where(x => x.IsDeleted == false).ToList();
+                
+
+            }
+            return View(SuperAdminmodel);
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpGet]
         public async Task<IActionResult> AdminIndexAsync()
         {
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);

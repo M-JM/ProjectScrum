@@ -1,14 +1,61 @@
-﻿@{
-    ViewData["Title"] = "SuperAdmin Landing Page";
-}
+﻿@model SuperAdminIndexViewModel
+@{
+    ViewData["Title"] = "Admin Landing Page";
 
-<div class="row my-auto d-flex justify-content-center">
-    <div class="jumbotron col-10 justify-content-center">
-        <h1 class="display-3">Scrum Web App</h1>
-        <p class="lead">Enable Scrum for your company</p>
-        <hr class="my-4">
-        <p>Better efficienty <p>
-        <p class="lead">
-        </p>
+}
+<div class="row justify-content-center m-3">
+    <div class=" text-center col-6 mt-4 mb-1">
+        <H1 >Overview of companies</H1>
     </div>
+</div>
+
+<div class="row justify-content-center m-3">
+    <div class=" text-center col-6 mt-4 mb-4">
+        <h3 > number of users not assigned @Model.Users.Where(x => x.CompanyId == null && x.IsDeleted == false).Count() </h3>
+        <a asp-action="ListUsers" asp-controller="Administration" class="btn btn-primary mr-1"> Go to User list </a>
+    </div>
+</div>
+
+<div class="row justify-content-center m-3">
+    <table class="table table-striped bg-light text-center col-8 mt-4">
+        <thead>
+            <tr>
+
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col"># Users assigned</th>
+                <th scope="col"># Board assigned</th>
+
+            </tr>
+        </thead>
+        <tbody class="">
+            @foreach (var company in Model.Companies)
+            {
+
+                <tr>
+
+                    <td>@company.Id</td>
+                    <td>@company.Name</td>
+                    @if (company.Employees != null && company.Employees.Count != 0)
+                    {
+                        <td>@company.Employees.Where(x => x.IsDeleted == false).Count() </td>
+                    }
+                    else
+                    {
+                        <td> No Users Assigned</td>
+                    }
+                    <td>
+                        @Model.boards.Where(x => x.CompanyId == company.Id && x.IsDeleted == false).Count()
+
+                    </td>
+                </tr>
+
+            }
+
+
+
+
+        </tbody>
+
+    </table>
 </div>
