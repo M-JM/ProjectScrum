@@ -30,7 +30,6 @@
                 @if (User.IsInRole("Admin"))
                 {
                     <a asp-action="AssignUsers" asp-controller="Boards" asp-route-boardid="@board.Id" class="btn btn-success">Manage board users</a>
-                    <a asp-action="Create" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-success">Add Task</a>
                     <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-dark">View Tasks</a>
                     <a asp-action="Update" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-warning">Edit</a>
                     <a asp-action="Delete" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-danger">Delete</a>
@@ -44,7 +43,6 @@
                 else
                 {
                     <a asp-action="AssignUsers" asp-controller="Boards" asp-route-boardid="@board.Id" class="btn btn-success">Manage board users</a>
-                    <a asp-action="Create" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-success">Add Task</a>
                     <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-dark">View Tasks</a>
                     <a asp-action="Update" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-warning">Edit</a>
                     <a asp-action="Delete" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-danger">Delete</a>

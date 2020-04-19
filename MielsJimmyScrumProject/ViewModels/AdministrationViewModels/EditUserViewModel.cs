@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,12 +20,16 @@ namespace MielsJimmyScrumProject.ViewModels.AdministrationViewModels
 
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
-            ErrorMessage = "Email must be a valid Address Email.")]
+        ErrorMessage = "Email must be a valid Address Email.")]
         public string Email { get; set; }
 
         [Required]
         public string UserName { get; set; }
-
+        
         public IList<string> Roles { get; set; }
+
+        public List<IdentityRole> AllRoles { get; set; }
+        [Required]
+        public string NewRole { get; set; }
     }
 }

@@ -70,7 +70,7 @@ namespace MielsJimmyScrumProject.Controllers
                 if (result.Succeeded)
                 {
                   return RedirectToAction("ListUsers","Administration");
-                    }
+                }
                 // If there are any errors, add them to the ModelState object
                 // which will be displayed by the validation summary tag helper
                 foreach (var error in result.Errors)
@@ -78,9 +78,9 @@ namespace MielsJimmyScrumProject.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+                return View("Register",model);
+            }
             return View(model);
-        }
-            return View("Error"); // global expection
         }
 
         [HttpPost]
@@ -157,7 +157,7 @@ namespace MielsJimmyScrumProject.Controllers
                     }
                     else if (await _userManager.IsInRoleAsync(currentuser, "SuperAdmin"))
                     {
-                        return RedirectToAction("SuperAdminIndex", "Home");
+                        return RedirectToAction("SuperAdminIndex","Home");
                     }
 
                     return RedirectToAction("Index", "Home");

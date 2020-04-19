@@ -25,6 +25,7 @@ namespace MielsJimmyScrumProject.Controllers
             _boardRepository = boardRepository;
             _userManager = userManager;
         }
+        [AllowAnonymous]
         public IActionResult Index()
         {
             if(User.IsInRole("Admin"))
@@ -42,6 +43,11 @@ namespace MielsJimmyScrumProject.Controllers
             // Check tegen role && signedin
             // En als geen role Index page
 
+            return View();
+        }
+        [Authorize(Roles = "SuperAdmin")]
+        public IActionResult SuperAdminIndex()
+        {
             return View();
         }
 

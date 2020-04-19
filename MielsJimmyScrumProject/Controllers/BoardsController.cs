@@ -9,8 +9,7 @@ using Microsoft.Extensions.Logging;
 using MielsJimmyScrumProject.ViewModels.BoardsViewModels;
 using MielsJimmyScrumProjectDAL.Models;
 using MielsJimmyScrumProjectDAL.Repositories;
-//test
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
 
 namespace MielsJimmyScrumProject.Controllers
 {
@@ -88,7 +87,6 @@ namespace MielsJimmyScrumProject.Controllers
             return View(model);
         }
 
-        //TODO CHECK ALL RETURNS
 
         [HttpGet]
         public async Task<IActionResult> DetailsAsync(int id)
@@ -149,13 +147,21 @@ namespace MielsJimmyScrumProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "SuperAdmin, Admin")]
-        public IActionResult Update(BoardEditViewModel editModel)
+        public async Task<IActionResult> UpdateAsync(BoardEditViewModel editModel)
         {
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+            var board = _boardRepository.GetById(editModel.Id);
 
-            if (ModelState.IsValid)
+            if (board == null || board.IsDeleted == true)
             {
-                var board = _boardRepository.GetById(editModel.Id);
-
+                Response.StatusCode = 404;
+                return View("BoardNotFound", board.Id);
+            }
+            else if (IsSuperAdmin || User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId) { 
+                if (ModelState.IsValid)
+            {
+              
                 board.Name = editModel.Name;
                 board.Description = editModel.Description;
                 board.UpdatedDate = DateTime.Now;
@@ -169,10 +175,10 @@ namespace MielsJimmyScrumProject.Controllers
                     return RedirectToAction("BoardsList");
                 }
             }
-
             return View();
         }
-
+            return View("NotAuthorized");
+        }
 
         [HttpGet]
         [Authorize(Roles = "SuperAdmin, Admin")]
@@ -196,9 +202,18 @@ namespace MielsJimmyScrumProject.Controllers
         }
 
         [Authorize(Roles = "SuperAdmin, Admin")]
-        public IActionResult DeleteSure(int id)
+        public async Task<IActionResult> DeleteSureAsync(int id)
         {
             var board = _boardRepository.GetById(id);
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (board == null || board.IsDeleted == true)
+            {
+                Response.StatusCode = 404;
+                return View("BoardNotFound", id);
+            }
+            else if (User.IsInRole("SuperAdmin") || board.CompanyId == currentuser.CompanyId)
+            {
 
             board.IsDeleted = true;
             board.UpdatedBy = User.Identity.Name;
@@ -233,6 +248,8 @@ namespace MielsJimmyScrumProject.Controllers
             }
 
             return View(board);
+        }
+            return View("NotAuthorized");
         }
         [HttpGet]
         public async Task<IActionResult> BoardsListAsync()
@@ -380,8 +397,6 @@ namespace MielsJimmyScrumProject.Controllers
         }
     }
 
- //TODO when removing a User to Board the entry in Join table needs to be also removed !
- //When calling up the boardusers , the users who are Isdeleted == True need to be exlucuded.
 }
 
 

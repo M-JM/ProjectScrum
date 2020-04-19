@@ -57,9 +57,9 @@
                         <td> No Users Assigned</td>
                     }
                 <td>
-                         
-                    <a asp-action="Details" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-success">View Details</a>
-                
+                    <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-success">View Tasks</a>
+                    <a asp-action="Details" asp-controller="Boards" asp-route-id="@board.Id" class="btn btn-success">View Board Details</a>
+
 
                 </td>
 

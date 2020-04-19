@@ -23,39 +23,7 @@ namespace MielsJimmyScrumProject.Controllers
             _roleManager = roleManager;
             _userManager = userManager;
         }
-        //  [Authorize(Roles = "SuperAdmin")]
-        [HttpGet]
-        public IActionResult CreateRole()
-        {
-            return View();
-        }
-        //  [Authorize(Roles = "SuperAdmin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateRole(CreateRoleViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var identityRole = new IdentityRole()
-                {
-                    Name = model.RoleName
-                };
-
-                var result = await _roleManager.CreateAsync(identityRole);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ListRoles", "Administration");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-
-            return View(model);
-        }
-
+         
         [HttpGet]
         public async Task<IActionResult> ListUsersAsync()
         {
@@ -92,19 +60,39 @@ namespace MielsJimmyScrumProject.Controllers
                 ViewBag.ErrorMessage = $"User with Id = {id} cannot be found!";
                 return View("NotFound");
             }
-
+            
+            var allRoles = _roleManager.Roles.ToList();
+            var AdminRoles = _roleManager.Roles.Skip(1).ToList();
             var userRoles = await _userManager.GetRolesAsync(user);
-           
-           
+            if (User.IsInRole("SuperAdmin")) { 
+            
             var model = new EditUserViewModel()
             {
                 Id = user.Id,
                 Email = user.Email,
                 UserName = user.UserName,
                 Roles = userRoles,
+                AllRoles = allRoles,
+                              
             };
+                return View(model);
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                var model = new EditUserViewModel()
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserName = user.UserName,
+                    Roles = userRoles,
+                    AllRoles = AdminRoles
+                    
 
-            return View(model);
+                };
+                return View(model);
+            }
+            return View("NotAuthorized");
+           
         }
 
         [HttpPost]
@@ -114,16 +102,20 @@ namespace MielsJimmyScrumProject.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(model.Id);
+                var currentrole = await _userManager.GetRolesAsync(user);
+                
 
                 if (user == null)
                 {
                     ViewBag.ErrorMessage = $"User with Id = {model.Id} cannot be found!";
                     return View("NotFound");
                 }
-
+                await _userManager.RemoveFromRoleAsync(user, currentrole.First());
+                await _userManager.AddToRoleAsync(user, model.NewRole);
+                
                 user.Email = model.Email;
                 user.UserName = model.UserName;
-             
+                
                 var identityResult = await _userManager.UpdateAsync(user);
 
                 if (identityResult.Succeeded)
@@ -139,6 +131,7 @@ namespace MielsJimmyScrumProject.Controllers
 
             return View(model);
         }
+
         [HttpGet]
         public async Task<IActionResult> EditUserInRole(string roleId)
         {
@@ -174,6 +167,7 @@ namespace MielsJimmyScrumProject.Controllers
 
             return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -224,69 +218,7 @@ namespace MielsJimmyScrumProject.Controllers
             return RedirectToAction("EditRole", new { Id = roleId });
         }
         [Authorize(Roles = "SuperAdmin")]
-        [HttpGet]
-        public async Task<IActionResult> EditRole(string id)
-        {
-            var role = await _roleManager.FindByIdAsync(id);
-
-            if (role == null)
-            {
-                ViewBag.ErrorMessage = $"Role with Id = {id} cannot be found!";
-                return View("NotFound");
-            }
-
-            var model = new EditRoleViewModel()
-            {
-                Id = role.Id,
-                RoleName = role.Name,
-            };
-
-            var listUser = _userManager.Users.ToList();
-
-            foreach (var user in listUser)
-            {
-                var isInRole = await _userManager.IsInRoleAsync(user, role.Name);
-
-                if (isInRole)
-                {
-                    model.Users.Add(user.UserName);
-                }
-            }
-
-            return View(model);
-        }
-        [Authorize(Roles = "SuperAdmin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditRole(EditRoleViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var role = await _roleManager.FindByIdAsync(model.Id);
-
-                if (role == null)
-                {
-                    ViewBag.ErrorMessage = $"Role with Id = {model.Id} cannot be found!";
-                    return View("NotFound");
-                }
-
-                role.Name = model.RoleName;
-
-                var result = await _roleManager.UpdateAsync(role);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ListRoles", "Administration");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-
-            return View(model);
-        }
+       
 
         [HttpPost]
         public async Task<IActionResult> DeleteUserAsync(string id)
