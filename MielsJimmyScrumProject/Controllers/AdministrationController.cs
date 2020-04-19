@@ -36,7 +36,7 @@ namespace MielsJimmyScrumProject.Controllers
             }
             else
             {
-               users = _userManager.Users.ToList();
+               users = _userManager.Users.Where(x => x.IsDeleted == false).ToList();
             }
                       
             return View(users);
@@ -109,6 +109,12 @@ namespace MielsJimmyScrumProject.Controllers
                 {
                     ViewBag.ErrorMessage = $"User with Id = {model.Id} cannot be found!";
                     return View("NotFound");
+                }
+
+                else if (currentrole.Count == 0)
+                {
+                    await _userManager.AddToRoleAsync(user, model.NewRole);
+                    return RedirectToAction("ListUsers", "Administration");
                 }
                 await _userManager.RemoveFromRoleAsync(user, currentrole.First());
                 await _userManager.AddToRoleAsync(user, model.NewRole);
@@ -224,6 +230,7 @@ namespace MielsJimmyScrumProject.Controllers
         public async Task<IActionResult> DeleteUserAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            var roles = await _userManager.GetRolesAsync(user);
 
             if (user == null)
             {
@@ -234,13 +241,17 @@ namespace MielsJimmyScrumProject.Controllers
             user.IsDeleted = true;
             user.UpdatedDate = DateTime.Now;
             user.UpdatedBy = User.Identity.Name;
-
+          
+            foreach(var role in roles) { 
+            await _userManager.RemoveFromRoleAsync(user, role);
+            }
             // delete related record in boarduser
 
             var identityResult = await _userManager.UpdateAsync(user);
 
             if (identityResult.Succeeded)
             {
+             
                 return RedirectToAction("ListUsers", "Administration");
             }
 

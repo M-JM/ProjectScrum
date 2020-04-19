@@ -138,7 +138,7 @@ namespace MielsJimmyScrumProject.Controllers
             {
                 var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 
-                if (signInResult.Succeeded )
+                if (signInResult.Succeeded)
                 {
                     if (string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
@@ -146,27 +146,30 @@ namespace MielsJimmyScrumProject.Controllers
                     }
                     var currentuser = await _userManager.FindByEmailAsync(model.Email);
 
-                    //if (User.IsInRole("Admin"))
-                    if (await _userManager.IsInRoleAsync(currentuser, "Admin"))
+                    if (await _userManager.IsInRoleAsync(currentuser, "Admin") && currentuser.IsDeleted == false)
                     {
                         return RedirectToAction("AdminIndex", "Home");
                     }
-                    else if (await _userManager.IsInRoleAsync(currentuser, "User"))
+                    else if (await _userManager.IsInRoleAsync(currentuser, "User") && currentuser.IsDeleted == false)
                     {
                         return RedirectToAction("UserIndex", "Home");
                     }
-                    else if (await _userManager.IsInRoleAsync(currentuser, "SuperAdmin"))
+                    else if (await _userManager.IsInRoleAsync(currentuser, "SuperAdmin") && currentuser.IsDeleted == false)
                     {
                         return RedirectToAction("SuperAdminIndex","Home");
                     }
-
-                    return RedirectToAction("Index", "Home");
+                    if(currentuser.IsDeleted == false)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+                    return View();
                 }
-                
+               
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
             }
 
-            return View(model);
+            return View();
         }
 
         [HttpPost]

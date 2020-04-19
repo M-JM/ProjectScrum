@@ -28,6 +28,8 @@ namespace MielsJimmyScrumProject.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
+      
+            
             if(User.IsInRole("Admin"))
 
             { return RedirectToAction("AdminIndex"); }
@@ -40,8 +42,7 @@ namespace MielsJimmyScrumProject.Controllers
             {
             { return RedirectToAction("SuperAdminIndex"); }
             }
-            // Check tegen role && signedin
-            // En als geen role Index page
+           
 
             return View();
         }

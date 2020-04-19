@@ -109,25 +109,6 @@ namespace MielsJimmyScrumProject.Controllers
             return View("NotAuthorized");
         }
 
-        //[HttpGet]
-        //public IActionResult Details(CompanyDetailViewModel detailModel)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        Board board = new Board
-        //        {
-        //            Name = detailModel.Name,
-        //            Description = detailModel.Description,
-        //            CreatedBy = User.Identity.Name,
-        //            CreatedDate = DateTime.Now,
-        //            CompanyId = detailModel.CompanyID
-        //        };
-        //        _boardRepository.Create(board);
-        //    }
-
-        //    return View(detailModel);
-        //}
-        //TODO check if this is necessary, normally it's not
         [HttpGet]
         public async Task<IActionResult> UpdateAsync(int id)
         {
@@ -276,7 +257,7 @@ namespace MielsJimmyScrumProject.Controllers
             }
 
             var model = new List<AssignEmployeesViewModel>();
-            var userList = _companyRepository.GetAllUsersfromCompany(companyId);
+            var userList = _companyRepository.GetAllUsersfromCompany(companyId).Where(x => x.IsDeleted == false);
             
             foreach (var user in userList)
             {
