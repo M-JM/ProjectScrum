@@ -17,9 +17,9 @@
                         {
                             <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-success">Back to overview</a>
                         }
-                        else
+                        else if (User.IsInRole("User"))
                         {
-                            <a asp-action="CompanyList" asp-controller="Companies" class="btn btn-success">Return to company Overview</a>
+                            <a asp-action="UserIndex" asp-controller="Home" class="btn btn-success">Back to overview</a>
                         }
                     </h6>
                 </div>

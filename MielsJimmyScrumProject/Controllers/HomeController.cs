@@ -31,10 +31,18 @@ namespace MielsJimmyScrumProject.Controllers
 
             { return RedirectToAction("AdminIndex"); }
 
-                // Check tegen role && signedin
-                // En als geen role Index page
+            else if (User.IsInRole("User"))
+            {
+            { return RedirectToAction("UserIndex"); }
+            }
+            else if (User.IsInRole("SuperAdmin"))
+            {
+            { return RedirectToAction("SuperAdminIndex"); }
+            }
+            // Check tegen role && signedin
+            // En als geen role Index page
 
-                return View();
+            return View();
         }
 
         [Authorize(Roles = "Admin")]
@@ -59,17 +67,18 @@ namespace MielsJimmyScrumProject.Controllers
         {
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
             var company = _companyRepository.GetById(currentuser.CompanyId);
-            var boards = _boardRepository.GetAllBoardsfromcompany(company.Id);
+           // var boards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).ToList();
+            var UserBoards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id && x.IsDeleted == false)).ToList();
 
 
-            var AdminIndexView = new AdminIndexViewModel();
+            var UserIndexView = new UserIndexViewModel();
             {
-                AdminIndexView.company = company;
-                AdminIndexView.boards = boards;
+                UserIndexView.company = company;
+                UserIndexView.boards = UserBoards;
 
             }
 
-            return View(AdminIndexView);
+            return View(UserIndexView);
         }
 
 

@@ -9,8 +9,7 @@ namespace MielsJimmyScrumProjectDAL.Models
       
         ToDo,
         Doing,
-        Done,
-        None
+        Done
     }
 
 }

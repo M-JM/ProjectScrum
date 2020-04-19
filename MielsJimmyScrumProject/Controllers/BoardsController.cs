@@ -91,14 +91,17 @@ namespace MielsJimmyScrumProject.Controllers
         {
             var board = _boardRepository.GetById(id);
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+            var UserBoards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id && x.IsDeleted == false)).ToList();
 
             if (board == null || board.IsDeleted == true)
             {
                 Response.StatusCode = 404;
                 return View("BoardNotFound", id);
             }
-            else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId) { 
+            else if (User.IsInRole("SuperAdmin") ||
+                User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId
+                || User.IsInRole("User") && board.CompanyId == currentuser.CompanyId && UserBoards.Contains(board)
+                ) { 
 
                 BoardDetailViewModel detailViewModel = new BoardDetailViewModel()
             {

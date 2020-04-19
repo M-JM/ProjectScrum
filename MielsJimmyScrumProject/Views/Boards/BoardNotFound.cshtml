@@ -9,18 +9,18 @@
     <div class="row text-center">
         <div class="col-lg-6 offset-lg-3 col-md-6 offset-md-3 col-12 p-3 error-main">
             <div class="row">
-                <div class="col-lg-8 col-12 col-sm-10 offset-lg-2 offset-sm-1">
+                <div class="col-lg-10 col-12 col-sm-10 offset-sm-1 offset-sm-1">
                     <h1 class="m-0">404</h1>
-                    <h6>Board not found</h6>
-                    <p>Board with ID = @Model cannot be found</p>
+                    <h3 class="mt-2">Board not found</h3>
+                    <h4 class="mt-2">Board with ID = @Model cannot be found</h4>
                     <h6>
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-action="BoardsList" asp-controller="Boards" class="btn btn-success">Back to overview</a>
+                            <a asp-action="BoardsList" asp-controller="Boards" class="btn btn-success">Back to Overview</a>
                         }
-                        else
+                        else if(User.IsInRole("User"))
                         {
-                            <a asp-action="BoardsList" asp-controller="Boards" class="btn btn-success">Return to company Overview</a>
+                            <a asp-action="UserIndex" asp-controller="Home" class="btn btn-success">Back to Overview</a>
                         }
                     </h6>
                 </div>

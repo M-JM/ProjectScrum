@@ -23,7 +23,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="3" cols="20" > </textarea>
+                <textarea asp-for="Description" class="form-control" rows="3" cols="20"> </textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group row">
@@ -44,14 +44,15 @@
                     </div>
                     <div class="card-body">
 
-                        @if(Model.AvailableUsers.Count != 0) { 
-                        @foreach (var user in Model.AvailableUsers)
+                        @if (Model.AvailableUsers.Count != 0)
                         {
+                            @foreach (var user in Model.AvailableUsers)
+                            {
 
-                            <input type="radio" asp-for="Userid" value="@user.ApplicationUserId" name="Userid">
-                            <label>@user.ApplicationUser.UserName </label>
-                            <br />
-                        }
+                                <input type="radio" asp-for="Userid" value="@user.ApplicationUserId" name="Userid">
+                                <label>@user.ApplicationUser.UserName </label>
+                                <br />
+                            }
                         }
                         else
                         {
@@ -63,13 +64,23 @@
             }
             else
             {
-                <input type="hidden" asp-for="Userid"value="@currentUser.Id">
+                <input type="hidden" asp-for="Userid" value="@currentUser.Id">
             }
+                      
+            <div class="btn-toolbar" role="toolbar">
+                @if (User.IsInRole("Admin"))
+                {
+                    <input type="submit" value="Create" class="btn btn-success " />
+                    <a class="btn btn-dark" asp-action="details" asp-controller="Boards" asp-route-id="@Model.BoardId">Back to board details</a>
+                }
+                else if (User.IsInRole("User"))
+                {
+                    <input type="submit" value="Create" class="btn btn-success mr-1 " />
+                    <a asp-action="tasklist" asp-controller="tasks" asp-route-boardid="@Model.BoardId" class="btn btn-primary mr-1">Back to overview</a>
+                }
 
-        <div class="form-group col-lg-12 text-center mt-2">
-            <input type="submit" value="Create" class="btn btn-primary " />
-            <a class="btn btn-dark" asp-action="details" asp-controller="Boards" asp-route-id="@Model.BoardId">Back to board details</a>
-        </div>
+
+            </div>
         </form>
     </div>
 </div>

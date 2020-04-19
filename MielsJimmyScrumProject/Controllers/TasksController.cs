@@ -299,8 +299,8 @@ namespace MielsJimmyScrumProject.Controllers
          {
 
             var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var boards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).ToList();
-            var UserBoards = boards.Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id)).ToList();
+           // var boards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).ToList();
+            var UserBoards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id)).ToList();
            
 
 

@@ -151,6 +151,14 @@ namespace MielsJimmyScrumProject.Controllers
                     {
                         return RedirectToAction("AdminIndex", "Home");
                     }
+                    else if (await _userManager.IsInRoleAsync(currentuser, "User"))
+                    {
+                        return RedirectToAction("UserIndex", "Home");
+                    }
+                    else if (await _userManager.IsInRoleAsync(currentuser, "SuperAdmin"))
+                    {
+                        return RedirectToAction("SuperAdminIndex", "Home");
+                    }
 
                     return RedirectToAction("Index", "Home");
                 }

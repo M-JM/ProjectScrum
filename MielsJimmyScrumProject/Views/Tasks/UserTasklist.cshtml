@@ -5,166 +5,410 @@
     ViewData["Title"] = "Index";
     var user = await userManager.GetUserAsync(Context.User);
 }
-@if(Model.Boards != null) { 
-
-@foreach (var Board in Model.Boards)
+@if (Model.Boards != null)
 {
-    <p>@Board.Name</p>
 
-    <div class="row justify-content-center m-3">
-        <table class="table table-striped bg-light text-center">
+    @foreach (var Board in Model.Boards)
+    {
+
+        <div class="container-fluid m-4">
+            <h1 class="mb-2 text-center">Board Name : @Board.Name</h1>       
+        </div>
+     
+
+        <div class="row">
+
+            <div class="card-group col-4">
+                <div class="card bg-default">
+                    <div class="card-header text-center">
+                        <strong>To Do</strong>
+                    </div>
+                    <div class="card-body text-center">
+
+                        @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo && x.ApplicationUser == user && x.IsDeleted == false))
+                        {
+
+                            <div class="card mb-2 text-white bg-dark text-center">
+                                <div class="card-header">
+                                    <strong>
+                                        @task.Title
+                                    </strong>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p class="card-text">
+                                        @task.Description
+                                    </p>
+                                    <footer class="blockquote-footer text-white">
+                                        assigned to user :  @task.ApplicationUser.UserName
+                                    </footer>
+                                    <div class="card-body text-center">
+                                        <p class="card-text ">
+                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
+                    </div>
+
+                    </div>
+            </div>
+            <div class="card-group col-4">
+                <div class="card bg-default">
+                    <div class="card-header text-center">
+                        <strong>Doing</strong>
+                    </div>
+
+                    <div class="card-body text-center">
+                        @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Doing && x.ApplicationUser == user && x.IsDeleted == false))
+                        {
+                            <div class="card mb-2 text-white bg-dark text-center">
+                                <div class="card-header">
+                                    <strong>
+                                        @task.Title
+                                    </strong>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p class="card-text">
+                                        @task.Description
+                                    </p>
+                                    <footer class="blockquote-footer text-white">
+                                        assigned to user :  @task.ApplicationUser.UserName
+                                    </footer>
+                                    <div class="card-body text-center">
+                                        <p class="card-text ">
+                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
 
 
-            <thead class="collapsible">
 
-                <tr>
-                    <th>Todo</th>
-                    <th>Done </th>
-                    <th>Doing </th>
-                </tr>
+                </div>
+            </div>
+            <div class="card-group col-4">
+                <div class="card bg-default">
+                    <div class="card-header text-center">
+                        <strong>Done</strong>
+                    </div>
+
+                    <div class="card-body text-center">
+                        @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Done && x.ApplicationUser == user && x.IsDeleted == false))
+                        {
+                            <div class="card mb-2 text-white bg-dark text-center">
+                                <div class="card-header">
+                                    <strong>
+                                        @task.Title
+                                    </strong>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p class="card-text">
+                                        @task.Description
+                                    </p>
+                                    <footer class="blockquote-footer text-white">
+                                        assigned to user :  @task.ApplicationUser.UserName
+                                    </footer>
+                                    <div class="card-body text-center">
+                                        <p class="card-text ">
+                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
 
 
-            </thead>
-            <tbody align="center" >
-                <tr>
-                    <td>
 
-                        <table class="content">
+                </div>
+            </div>
 
-                            <tbody align="center">
-                                @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo && x.ApplicationUser == user))
+
+        </div>
+    }
+
+    @*<div class="row">
+
+            <div class="card-group col-4">
+                <div class="card bg-default">
+                    <div class="card-header text-center">
+                        <strong>To Do</strong>
+                    </div>
+
+                    <div class="card-body text-center">
+                        @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo && x.ApplicationUser == user))
+                        {
+                            <div class="card mb-2 text-white bg-dark text-center">
+                                <div class="card-header">
+                                    <strong>
+                                        @task.Title
+                                    </strong>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p class="card-text">
+                                        @task.Description
+                                    </p>
+                                    <footer class="blockquote-footer text-white">
+                                        assigned to user :  @task.ApplicationUser.UserName
+                                    </footer>
+                                    <div class="card-body text-center">
+                                        <p class="card-text ">
+                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-group col-4">
+                        <div class="card bg-default">
+                            <div class="card-header text-center">
+                                <strong>Doing</strong>
+                            </div>
+
+                            <div class="card-body text-center">
+                                @foreach (var task in Model.DoingTasks)
                                 {
-                                    <tr align="center">
-
-                                        <td align="center">
-
-                                            <div class="card-body text-center ">
-
-                                                <div class="card mb-2 text-white bg-dark ">
-                                                    <div class="card-header">
-                                                        <strong>
-                                                            @task.Title
-                                                        </strong>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <p class="card-text">
-                                                            @task.Description
-                                                        </p>
-                                                        <div class="card-body ">
-                                                            <p class="card-text ">
-                                                                <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
+                                    <div class="card mb-2 text-white bg-dark text-center">
+                                        <div class="card-header">
+                                            <strong>
+                                                @task.Title
+                                            </strong>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <p class="card-text">
+                                                @task.Description
+                                            </p>
+                                            <footer class="blockquote-footer text-white">
+                                                assigned to user :  @task.ApplicationUser.UserName
+                                            </footer>
+                                            <div class="card-body text-center">
+                                                <p class="card-text ">
+                                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                </p>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </div>
                                 }
-                            </tbody>
+                            </div>
 
-                        </table>
 
-                    </td>
-                    <td class="text-center">
-                        <table align="center" class="content">
 
-                            @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Doing && x.ApplicationUser == user))
-                            {
+                            <p>@Board.Name</p>
 
-                                <tr class="text-center">
+                            <div class="row justify-content-center m-3">
+                                <table class="table table-striped bg-light text-center">
 
-                                    <td class="text-center">
-                                        <div class="card-body text-center ">
 
-                                            <div class="card mb-2 text-white bg-dark text-center">
-                                                <div class="card-header">
-                                                    <strong>
-                                                        @task.Title
-                                                    </strong>
-                                                </div>
-                                                <div class="card-body text-center">
-                                                    <p class="card-text">
-                                                        @task.Description
-                                                    </p>
-                                                    <div class="card-body text-center">
-                                                        <p class="card-text ">
-                                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <thead class="collapsible">
 
-                                        </div>
-                                    </td>
-                                </tr>
+                                        <tr>
+                                            <th>Todo</th>
+                                            <th>Done </th>
+                                            <th>Doing </th>
+                                        </tr>
+
+
+                                    </thead>
+                                    <tbody align="center">
+                                        <tr>
+                                            <td>
+
+                                                <table class="content">
+
+                                                    <tbody align="center">
+                                                        @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo && x.ApplicationUser == user))
+                                                        {
+                                                            <tr align="center">
+
+                                                                <td align="center">
+
+                                                                    <div class="card-body text-center ">
+
+                                                                        <div class="card mb-2 text-white bg-dark ">
+                                                                            <div class="card-header">
+                                                                                <strong>
+                                                                                    @task.Title
+                                                                                </strong>
+                                                                            </div>
+                                                                            <div class="card-body">
+                                                                                <p class="card-text">
+                                                                                    @task.Description
+                                                                                </p>
+                                                                                <div class="card-body ">
+                                                                                    <p class="card-text ">
+                                                                                        <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+
+                                                </table>
+
+                                            </td>
+                                            <td class="text-center">
+                                                <table align="center" class="content">
+
+                                                    @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Doing && x.ApplicationUser == user))
+                                                    {
+
+                                                        <tr class="text-center">
+
+                                                            <td class="text-center">
+                                                                <div class="card-body text-center ">
+
+                                                                    <div class="card mb-2 text-white bg-dark text-center">
+                                                                        <div class="card-header">
+                                                                            <strong>
+                                                                                @task.Title
+                                                                            </strong>
+                                                                        </div>
+                                                                        <div class="card-body text-center">
+                                                                            <p class="card-text">
+                                                                                @task.Description
+                                                                            </p>
+                                                                            <div class="card-body text-center">
+                                                                                <p class="card-text ">
+                                                                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+
+                                                </table>
+                                            </td>
+                                            <td class="text-center">
+                                                <table align="center" class="content">
+
+                                                    @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Done && x.ApplicationUser == user))
+                                                    {
+                                                        <tr class="text-center">
+
+                                                            <td class="text-center">
+                                                                <div class="card-body text-center ">
+
+                                                                    <div class="card mb-2 text-white bg-dark text-center">
+                                                                        <div class="card-header">
+                                                                            <strong>
+                                                                                @task.Title
+                                                                            </strong>
+                                                                        </div>
+                                                                        <div class="card-body text-center">
+                                                                            <p class="card-text">
+                                                                                @task.Description
+                                                                            </p>
+                                                                            <div class="card-body text-center">
+                                                                                <p class="card-text ">
+                                                                                    <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+
+                                                </table>
+                                            </td>
+                                        </tr>
+
+
+
+                                    </tbody>
+
+
+                                </table>
+                            </div>
                             }
 
 
-                        </table>
-                    </td>
-                    <td class="text-center">
-                        <table align="center" class="content">
-
-                            @foreach (var task in Board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Done && x.ApplicationUser == user))
-                            {
-                                <tr class="text-center">
-
-                                    <td class="text-center">
-                                        <div class="card-body text-center ">
-
-                                            <div class="card mb-2 text-white bg-dark text-center">
-                                                <div class="card-header">
-                                                    <strong>
-                                                        @task.Title
-                                                    </strong>
-                                                </div>
-                                                <div class="card-body text-center">
-                                                    <p class="card-text">
-                                                        @task.Description
-                                                    </p>
-                                                    <div class="card-body text-center">
-                                                        <p class="card-text ">
-                                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-
-
-                        </table>
-                    </td>
-                </tr>
 
 
 
-            </tbody>
+
+                        </div>
+                    </div>
 
 
-        </table>
-    </div>
+
+
+                </div>
+            </div>
+            <div class="card-group col-4">
+                <div class="card bg-default">
+                    <div class="card-header text-center">
+                        <strong>Done</strong>
+                    </div>
+
+                    <div class="card-body text-center">
+                        @foreach (var task in Model.DoneTasks)
+                        {
+                            <div class="card mb-2 text-white bg-dark text-center">
+                                <div class="card-header">
+                                    <strong>
+                                        @task.Title
+                                    </strong>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p class="card-text">
+                                        @task.Description
+                                    </p>
+                                    <footer class="blockquote-footer text-white">
+                                        assigned to user :  @task.ApplicationUser.UserName
+                                    </footer>
+                                    <div class="card-body text-center">
+                                        <p class="card-text ">
+                                            <a asp-action="Details" asp-controller="tasks" asp-route-taskid="@task.Id" class="btn btn-primary btn-sm ">View details of task</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+        </div>*@
+
 }
-
+else if (Model.Boards == null)
+{
 
     <p> No Boards assigned to you </p>
 
 }
-
 @section Scripts {
     <script>
 
-        $(document).ready(function(){
-  $(".collapsible").click(function(){
-    $(".content").toggle();
-  });
-});
-            
+        $(document).ready(function () {
+            $(".collapsible").click(function () {
+                $(".content").toggle();
+            });
+        });
+
     </script>
 }
 @*@section Styles {
