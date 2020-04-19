@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MielsJimmyScrumProject.ViewModels.AdministrationViewModels;
 using MielsJimmyScrumProjectDAL.Models;
+using MielsJimmyScrumProjectDAL.Repositories;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,11 +18,13 @@ namespace MielsJimmyScrumProject.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ITaskRepository _taskRepository;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ITaskRepository taskRepository)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _taskRepository = taskRepository;
         }
          
         [HttpGet]
@@ -223,11 +226,10 @@ namespace MielsJimmyScrumProject.Controllers
 
             return RedirectToAction("EditRole", new { Id = roleId });
         }
-        [Authorize(Roles = "SuperAdmin")]
        
-
-        [HttpPost]
-        public async Task<IActionResult> DeleteUserAsync(string id)
+        
+        [Authorize(Roles = "SuperAdmin")]
+         public async Task<IActionResult> DeleteUserAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             var roles = await _userManager.GetRolesAsync(user);
@@ -241,10 +243,26 @@ namespace MielsJimmyScrumProject.Controllers
             user.IsDeleted = true;
             user.UpdatedDate = DateTime.Now;
             user.UpdatedBy = User.Identity.Name;
+            
+            var tasks = _taskRepository.GetAllTasksofUser(user.Id);
           
             foreach(var role in roles) { 
             await _userManager.RemoveFromRoleAsync(user, role);
             }
+
+            foreach(var task in tasks)
+            {
+                task.IsDeleted = true;
+                task.UpdatedBy = User.Identity.Name;
+                task.UpdatedDate = DateTime.Now;
+            }
+
+            //foreach(var board in boards)
+            //{
+            //    board.IsDeleted = true;
+            //    board.UpdatedBy = User.Identity.Name;
+            //    board.UpdatedDate = DateTime.Now;
+            //}
             // delete related record in boarduser
 
             var identityResult = await _userManager.UpdateAsync(user);

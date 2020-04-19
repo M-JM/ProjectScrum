@@ -82,6 +82,13 @@ namespace MielsJimmyScrumProjectDAL.Repositories
             }
         }
 
+        public IEnumerable<BoardTask> GetAllTasksofUser(string id)
+        {
+            var AllTasks = _context.Tasks.Where(t => t.Userid == id && t.IsDeleted == false);
+
+            return AllTasks;
+        }
+
         public IEnumerable<BoardTask> GetAllTasksofBoard(int boardid)
         {
             var AllTasks = _context.Tasks.Where(t => t.BoardId == boardid && t.IsDeleted == false);

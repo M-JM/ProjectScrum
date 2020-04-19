@@ -27,7 +27,7 @@ namespace MielsJimmyScrumProject.Controllers
             _signInManager = signInManager;
             _companyRepository = companyRepository;
         }
-      
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
@@ -60,25 +60,25 @@ namespace MielsJimmyScrumProject.Controllers
                         CreatedDate = DateTime.Now,
                         IsDeleted = false,
                         Company = company,
-                        
+
                     };
-               
-                var result = await _userManager.CreateAsync(user, model.Password);
-                var receivedUser = await _userManager.FindByEmailAsync(model.Email);
+
+                    var result = await _userManager.CreateAsync(user, model.Password);
+                    var receivedUser = await _userManager.FindByEmailAsync(model.Email);
                     await _userManager.AddToRoleAsync(receivedUser, "User");
-                // If user is successfully created
-                if (result.Succeeded)
-                {
-                  return RedirectToAction("ListUsers","Administration");
+                    // If user is successfully created
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+                    // If there are any errors, add them to the ModelState object
+                    // which will be displayed by the validation summary tag helper
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
-                // If there are any errors, add them to the ModelState object
-                // which will be displayed by the validation summary tag helper
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-                return View("Register",model);
+                return View("Register", model);
             }
             return View(model);
         }
@@ -90,14 +90,14 @@ namespace MielsJimmyScrumProject.Controllers
         {
             if (ModelState.IsValid)
             {
-               // Create a new Identity user with form received from RegisterViewModel
+                // Create a new Identity user with form received from RegisterViewModel
                 var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email,
                     CreatedBy = model.Email,
                     CreatedDate = DateTime.Now,
-                    IsDeleted = false,                          
+                    IsDeleted = false,
                 };
 
                 // Create the entry in the User Table ( Db)
@@ -133,45 +133,55 @@ namespace MielsJimmyScrumProject.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> LoginAsync(LoginViewModel model, string returnUrl)
         {
+            if (string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
             if (ModelState.IsValid)
             {
-                var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-                
-                if (signInResult.Succeeded)
-                {
-                    if (string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-                    {
-                        return Redirect(returnUrl);
-                    }
-                    var currentuser = await _userManager.FindByEmailAsync(model.Email);
+                //var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
+                //if (signInResult.Succeeded)
+                //{
+
+                var currentuser = await _userManager.FindByEmailAsync(model.Email);
+                if (currentuser != null)
+                {
+                 
                     if (await _userManager.IsInRoleAsync(currentuser, "Admin") && currentuser.IsDeleted == false)
                     {
+                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                         return RedirectToAction("AdminIndex", "Home");
                     }
                     else if (await _userManager.IsInRoleAsync(currentuser, "User") && currentuser.IsDeleted == false)
                     {
+                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                         return RedirectToAction("UserIndex", "Home");
                     }
                     else if (await _userManager.IsInRoleAsync(currentuser, "SuperAdmin") && currentuser.IsDeleted == false)
                     {
-                        return RedirectToAction("SuperAdminIndex","Home");
+                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                        return RedirectToAction("SuperAdminIndex", "Home");
                     }
-                   else if(currentuser.IsDeleted == false)
+                    else if(currentuser.IsDeleted == false)
                     {
+                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                         return RedirectToAction("Index", "Home");
                     }
-                    else { 
-                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-                    return View();
+                    else if(currentuser.IsDeleted == true)
+                    {
+                        ModelState.AddModelError(string.Empty, "Account does not exist");
+                        return View();
                     }
-                }
-                ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-                return View();
 
+                      ModelState.AddModelError(string.Empty, "Wrong credentials");
+                      return View();
+
+                }
             }
-            ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-            return View(model);
+            ModelState.AddModelError(string.Empty, "Invalid Login Attempt ");
+            return View();
         }
 
         [HttpPost]

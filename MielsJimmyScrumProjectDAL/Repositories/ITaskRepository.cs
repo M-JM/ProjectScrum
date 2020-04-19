@@ -14,7 +14,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
         // READ
         BoardTask GetById(int id);
         ApplicationUser GetCurrentUserId(string username);
-
+        IEnumerable<BoardTask> GetAllTasksofUser(string id);
         IEnumerable<BoardTask> GetAllToDoTask(int boardid);
         IEnumerable<BoardTask> GetAllDoingTask(int boardid);
         IEnumerable<BoardTask> GetAllDoneTask(int boardid);
