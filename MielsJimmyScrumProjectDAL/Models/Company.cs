@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MielsJimmyScrumProjectDAL.Models
@@ -8,7 +9,8 @@ namespace MielsJimmyScrumProjectDAL.Models
   public  class Company
     {
         public int Id { get; set; }
-
+        [Required]
+        [StringLength(50)]  
         public string Name { get; set; }
 
         public string PhotoPath { get; set; }

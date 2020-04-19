@@ -35,26 +35,31 @@ namespace MielsJimmyScrumProject.Controllers
      
         [HttpGet]
         [Authorize(Roles = "SuperAdmin, Admin")]
-        public IActionResult Create(int companyid)
+        public async Task<IActionResult> CreateAsync(int companyid)
         {
             
             var company = _companyRepository.GetById(companyid);
+            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-            if(company != null || company.IsDeleted != true) { 
-           
-            BoardCreateViewModel boardCreateViewModel = new BoardCreateViewModel()
-            {
-                        
-                Company = company,
-                                        
-            };
-
-            return View(boardCreateViewModel);
+            if (company == null || company.IsDeleted == true) {
+                Response.StatusCode = 404;
+                return View("../Companies/CompanyNotFound", companyid);
             }
+            else if (User.IsInRole("SuperAdmin") ||
+              User.IsInRole("Admin") && companyid == currentuser.CompanyId)
 
-            Response.StatusCode = 404;
-            return View("CompanyNotFound", companyid);
-        }
+            {
+                BoardCreateViewModel boardCreateViewModel = new BoardCreateViewModel()
+                {
+
+                    Company = company,
+
+                };
+                return View(boardCreateViewModel);
+            }
+          return View("NotAuthorized");
+                        
+}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -66,7 +71,7 @@ namespace MielsJimmyScrumProject.Controllers
                 var IsSuperAdmin = User.IsInRole("SuperAdmin");
                 var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-                if (IsSuperAdmin || model.CompanyId == currentuser.CompanyId) { 
+                if (IsSuperAdmin || User.IsInRole("Admin") && model.CompanyId == currentuser.CompanyId) { 
 
                     model.CreatedDate = DateTime.Now;
                     model.CreatedBy = User.Identity.Name;
@@ -76,8 +81,7 @@ namespace MielsJimmyScrumProject.Controllers
                     if (response != null && response.Id != 0)
                     {
                         return RedirectToAction("details", new { id = model.Id });
-                    }
-                    return View(model);
+                    }        
                 }
                 return View("NotAuthorized");
             }
@@ -125,7 +129,7 @@ namespace MielsJimmyScrumProject.Controllers
                 Response.StatusCode = 404;
                 return View("BoardNotFound", id);
             }
-            else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId)
+            else if (IsSuperAdmin || User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId)
             {
                 var boardEditViewModel = new BoardEditViewModel
             {
@@ -304,6 +308,7 @@ namespace MielsJimmyScrumProject.Controllers
                 else { 
             var Usermodel = new AssignUsersViewModel()
             {
+                
                 UserId = user.Id,
                 UserName = user.UserName,
                 IsSelected = false

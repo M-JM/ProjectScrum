@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -8,9 +9,10 @@ namespace MielsJimmyScrumProjectDAL.Models
     public class Board
     {
         public int Id { get; set; }
-
+        [Required]
+        [StringLength(50)]
         public string Name { get; set; }
-
+        [Required]
         public string Description { get; set; }
 
         public DateTime CreatedDate { get; set; }

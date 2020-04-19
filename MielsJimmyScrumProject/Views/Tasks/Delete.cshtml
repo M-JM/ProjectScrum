@@ -21,7 +21,7 @@
 
                 </div>
                 <div class="card-footer text-center">
-                    <a class="btn btn-success" asp-action="DeleteSure" asp-controller="Tasks" asp-route-taskid="@Model.Id">Are you sure you want to delete ?</a>
+                    <a class="btn btn-danger" asp-action="DeleteSure" asp-controller="Tasks" asp-route-taskid="@Model.Id">Are you sure you want to delete ?</a>
                     <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@Model.BoardId" class="btn btn-secondary">Back</a>
                 </div>
             </div>

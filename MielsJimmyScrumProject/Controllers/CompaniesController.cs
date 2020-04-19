@@ -204,7 +204,7 @@ namespace MielsJimmyScrumProject.Controllers
             {
             return View(company);
             }
-            return View("Error");
+            return View("NotAuthorized");
         }
 
        
@@ -221,6 +221,16 @@ namespace MielsJimmyScrumProject.Controllers
             if (response != null && response.Id != 0)
             {
                 var BoardsInDeletedCompany = _boardRepository.GetAllBoardsfromcompany(id).ToList();
+                var AllusersofCompany = _companyRepository.GetAllCompanyUsers(id);
+
+                foreach(var user in AllusersofCompany)
+                {
+                    user.IsDeleted = true;
+                    user.UpdatedBy = User.Identity.Name;
+                    user.UpdatedDate = DateTime.Now;
+
+                    _userManager.UpdateAsync(user);
+                }
 
                 foreach (var board in BoardsInDeletedCompany)
                 {
@@ -239,9 +249,14 @@ namespace MielsJimmyScrumProject.Controllers
                         _boardRepository.Delete(board);
                    
                 }
+                if (User.IsInRole("Admin")) { 
 
-
-                return RedirectToAction("CompanyList");
+                return RedirectToAction("Logout","Account");
+                }
+                else
+                {
+                return View("CompanyList");
+                }
             }
 
             return View();
