@@ -74,24 +74,32 @@ namespace MielsJimmyScrumProject.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CompanyCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (model.Photo != null)
+                if (ModelState.IsValid)
                 {
-                    model.CreatedDate = DateTime.Now;
-                    model.CreatedBy = User.Identity.Name; 
-                    model.PhotoPath = ProcessUploadFile(model);
+                    if (model.Photo != null)
+                    {
+                        model.CreatedDate = DateTime.Now;
+                        model.CreatedBy = User.Identity.Name;
+                        model.PhotoPath = ProcessUploadFile(model);
+                    }
+
+                    var response = _companyRepository.Create(model);
+
+                    if (response != null && response.Id != 0)
+                    {
+                        return RedirectToAction("CompanyList");
+                    }
                 }
 
-                var response = _companyRepository.Create(model);
-
-                if (response != null && response.Id != 0)
-                {
-                    return RedirectToAction("CompanyList");
-                }
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When trying to create a new company.");
+                throw;
+            }
 
             //TODO Implement error model.
         }
@@ -100,56 +108,72 @@ namespace MielsJimmyScrumProject.Controllers
         public async Task<IActionResult> DetailsAsync(int id)
         {
 
-            var company = _companyRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
-            
-            if (company == null || company.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("CompanyNotFound", id);
-            }
-           else if ( IsSuperAdmin || company.Id == currentuser.CompanyId)
-            { 
-       
-            CompanyDetailViewModel detailViewModel = new CompanyDetailViewModel()
-            {
-                Company = company
-                               
-        };
-                return View(detailViewModel);
-            }
+                var company = _companyRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
 
-       
-            return View("NotAuthorized");
+                if (company == null || company.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("CompanyNotFound", id);
+                }
+                else if (IsSuperAdmin || company.Id == currentuser.CompanyId)
+                {
+
+                    CompanyDetailViewModel detailViewModel = new CompanyDetailViewModel()
+                    {
+                        Company = company
+
+                    };
+                    return View(detailViewModel);
+                }
+
+
+                return View("NotAuthorized");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When trying to details of a company.");
+                throw;
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> UpdateAsync(int id)
         {
-            var company = _companyRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
-            
-            if (company == null || company.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("CompanyNotFound", id);
-            }
-            else if (IsSuperAdmin || company.Id == currentuser.CompanyId)
-            {   
+                var company = _companyRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
 
-            var companyEditViewModel = new CompanyEditViewModel
+                if (company == null || company.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("CompanyNotFound", id);
+                }
+                else if (IsSuperAdmin || company.Id == currentuser.CompanyId)
+                {
+
+                    var companyEditViewModel = new CompanyEditViewModel
+                    {
+                        Id = company.Id,
+                        Name = company.Name,
+                        ExistingPhotoPath = company.PhotoPath
+                    };
+
+                    return View(companyEditViewModel);
+                }
+
+                return View("NotAuthorized");
+            }
+            catch (Exception ex)
             {
-                Id = company.Id,       
-                Name = company.Name,
-                ExistingPhotoPath = company.PhotoPath
-            };
-
-            return View(companyEditViewModel);
+                _logger.LogError(ex, $"When getting the update  of a company.");
+                throw;
             }
-
-            return View("NotAuthorized"); 
                     
         }
 
@@ -157,156 +181,195 @@ namespace MielsJimmyScrumProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAsync(CompanyEditViewModel editModel)
         {
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            if (editModel.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("CompanyNotFound", editModel.Id);
-            }
-            else if (User.IsInRole("SuperAdmin") || editModel.Id == currentuser.CompanyId)
-            {
-
-                if (ModelState.IsValid)
-            {
-                var company = _companyRepository.GetById(editModel.Id);
-
-                company.Name = editModel.Name;
-                company.UpdatedDate = DateTime.Now;
-                company.UpdatedBy = User.Identity.Name;
-                
-                if(editModel.ExistingPhotoPath != null)
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                if (editModel.IsDeleted == true)
                 {
-                    DeleteImage(editModel.ExistingPhotoPath);
-                    company.PhotoPath = ProcessUploadFile(editModel);
+                    Response.StatusCode = 404;
+                    return View("CompanyNotFound", editModel.Id);
                 }
-                var response = _companyRepository.Update(company);
-                
-                if(response != null & response.Id != 0)
+                else if (User.IsInRole("SuperAdmin") || editModel.Id == currentuser.CompanyId)
                 {
-                    return RedirectToAction("Details", new { id = editModel.Id });
+
+                    if (ModelState.IsValid)
+                    {
+                        var company = _companyRepository.GetById(editModel.Id);
+
+                        company.Name = editModel.Name;
+                        company.UpdatedDate = DateTime.Now;
+                        company.UpdatedBy = User.Identity.Name;
+
+                        if (editModel.ExistingPhotoPath != null)
+                        {
+                            DeleteImage(editModel.ExistingPhotoPath);
+                            company.PhotoPath = ProcessUploadFile(editModel);
+                        }
+                        var response = _companyRepository.Update(company);
+
+                        if (response != null & response.Id != 0)
+                        {
+                            return RedirectToAction("Details", new { id = editModel.Id });
+                        }
+                    }
+
+                    return View();
+
                 }
+                return View("NotAuthorized");
             }
-
-            return View();
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When trying to update a company.");
+                throw;
             }
-            return View("NotAuthorized");
         }
         //TODO implement error view
         [HttpGet]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var company = _companyRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
+            try
+            {
+                var company = _companyRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
 
-            if (company == null || company.IsDeleted == true)
-            {
-                Response.StatusCode = 404;
-                return View("CompanyNotFound", id);
+                if (company == null || company.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("CompanyNotFound", id);
+                }
+                else if (IsSuperAdmin || company.Id == currentuser.CompanyId)
+                {
+                    return View(company);
+                }
+                return View("NotAuthorized");
             }
-            else if (IsSuperAdmin || company.Id == currentuser.CompanyId)
+            catch (Exception ex)
             {
-            return View(company);
+                _logger.LogError(ex, $"When getting the delete page of a company.");
+                throw;
             }
-            return View("NotAuthorized");
         }
 
        [HttpPost] 
-        public IActionResult DeleteSure(int id)
+        public async Task<IActionResult> DeleteSureAsync(int id)
         {
 
             //  TODO Defensive and check if admin is from current company.
 
-            var company = _companyRepository.GetById(id);
-
-            company.IsDeleted = true;
-            company.UpdatedBy = User.Identity.Name;
-            company.UpdatedDate = DateTime.Now;
-
-            var response = _companyRepository.Delete(company);
-
-            if (response != null && response.Id != 0)
+            try
             {
-                var BoardsInDeletedCompany = _boardRepository.GetAllBoardsfromcompany(id).ToList();
-               // var AllusersofCompany = _companyRepository.GetAllCompanyUsers(id);
+                var company = _companyRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-                foreach (var user in company.Employees)
+                company.IsDeleted = true;
+                company.UpdatedBy = User.Identity.Name;
+                company.UpdatedDate = DateTime.Now;
+
+                var response = _companyRepository.Delete(company);
+
+
+                if (User.IsInRole("SuperAdmin") || company.Id == currentuser.CompanyId)
                 {
-                    user.IsDeleted = true;
-                    user.UpdatedBy = User.Identity.Name;
-                    user.UpdatedDate = DateTime.Now;
 
-                    _userManager.UpdateAsync(user);
-                }
-
-                foreach (var board in BoardsInDeletedCompany)
-                {
-                    var listoftasksinboard = board.BoardTasks.ToList();
-                    board.IsDeleted = true;
-                    board.UpdatedBy = User.Identity.Name;
-                    board.UpdatedDate = DateTime.Now;
-
-                    foreach (var task in listoftasksinboard)
+                    if (response != null && response.Id != 0)
                     {
-                        task.IsDeleted = true;
-                        task.UpdatedBy = User.Identity.Name;
-                        task.UpdatedDate = DateTime.Now;
-                        _taskRepository.Delete(task);
+                        var BoardsInDeletedCompany = _boardRepository.GetAllBoardsfromcompany(id).ToList();
+                     
+                        foreach (var user in company.Employees)
+                        {
+                            user.IsDeleted = true;
+                            user.UpdatedBy = User.Identity.Name;
+                            user.UpdatedDate = DateTime.Now;
+
+                            await _userManager.UpdateAsync(user);
+                        }
+
+                        foreach (var board in BoardsInDeletedCompany)
+                        {
+                            var listoftasksinboard = board.BoardTasks.ToList();
+                            board.IsDeleted = true;
+                            board.UpdatedBy = User.Identity.Name;
+                            board.UpdatedDate = DateTime.Now;
+
+                            foreach (var task in listoftasksinboard)
+                            {
+                                task.IsDeleted = true;
+                                task.UpdatedBy = User.Identity.Name;
+                                task.UpdatedDate = DateTime.Now;
+                                _taskRepository.Delete(task);
+                            }
+                            _boardRepository.Delete(board);
+
+                        }
+                        if (User.IsInRole("Admin"))
+                        {
+
+                            return RedirectToAction("Logout", "Account");
+                        }
+
+                        return RedirectToAction("CompanyList");
                     }
-                    _boardRepository.Delete(board);
-
+                    return View("Delete", company);
                 }
-                if (User.IsInRole("Admin")) { 
+                return View("NotAuthorized");
 
-                return RedirectToAction("Logout","Account");
-                }
-
-                return RedirectToAction("CompanyList");
             }
-            return View("Delete",company) ;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When deleting a company.");
+                throw;
+            }
         }
-
         [HttpGet]
         public IActionResult AssignEmployees(int companyId)
         {
-            ViewBag.companyId = companyId;
-
-            var company = _companyRepository.GetById(companyId);
-
-            if (company == null || company.IsDeleted == true )
+            try
             {
-                Response.StatusCode = 404;
-                return View("CompanyNotFound", companyId);
+                ViewBag.companyId = companyId;
+
+                var company = _companyRepository.GetById(companyId);
+
+                if (company == null || company.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("CompanyNotFound", companyId);
+                }
+
+                var model = new List<AssignEmployeesViewModel>();
+                var userList = _companyRepository.GetAllUsersfromCompany(companyId).Where(x => x.IsDeleted == false);
+
+                foreach (var user in userList)
+                {
+                    var AssignEmployeesModel = new AssignEmployeesViewModel()
+                    {
+                        UserId = user.Id,
+                        UserName = user.UserName,
+
+                    };
+
+                    if (user.CompanyId != null)
+                    {
+                        AssignEmployeesModel.IsSelected = true;
+                    }
+                    else
+                    {
+                        AssignEmployeesModel.IsSelected = false;
+                    }
+
+
+
+                    model.Add(AssignEmployeesModel);
+
+                }
+                return View(model);
             }
-
-            var model = new List<AssignEmployeesViewModel>();
-            var userList = _companyRepository.GetAllUsersfromCompany(companyId).Where(x => x.IsDeleted == false);
-            
-            foreach (var user in userList)
+            catch (Exception ex)
             {
-                var AssignEmployeesModel = new AssignEmployeesViewModel()
-                {
-                    UserId = user.Id,
-                    UserName = user.UserName,
-                                                
-                };
-
-                if (user.CompanyId != null)
-                {
-                    AssignEmployeesModel.IsSelected = true; 
-                }
-                else
-                {
-                    AssignEmployeesModel.IsSelected = false;
-                }
-                
-
-
-                model.Add(AssignEmployeesModel);
-
-             }
-            return View(model);
+                _logger.LogError(ex, $"When getting the users assigned to a company.");
+                throw;
+            }
         }
         //TODO Admin of a company should be able to delete a user( soft delete) SuperAdmin can assign users who register from outside the company as admin
 
@@ -314,49 +377,57 @@ namespace MielsJimmyScrumProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignEmployeesAsync(List<AssignEmployeesViewModel> model, int companyId)
         {
-            var company = _companyRepository.GetById(companyId);
-
-            if (company == null || company.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("CompanyNotFound", companyId);
-            }
+                var company = _companyRepository.GetById(companyId);
 
-            for (int i = 0; i < model.Count; i++)
-            {
-                var user = await _userManager.FindByIdAsync(model[i].UserId);
-                IdentityResult result = null;
-
-                if (model[i].IsSelected)
+                if (company == null || company.IsDeleted == true)
                 {
-                    user.CompanyId = companyId;
-                    result = await _userManager.UpdateAsync(user);
-                    
-                }
-                else if (!model[i].IsSelected)
-                {
-                    user.CompanyId = null;
-                    result = await _userManager.UpdateAsync(user);
-                }
-                else
-                {
-                    continue;
+                    Response.StatusCode = 404;
+                    return View("CompanyNotFound", companyId);
                 }
 
-                if (result.Succeeded)
+                for (int i = 0; i < model.Count; i++)
                 {
-                    if (i < (model.Count - 1))
+                    var user = await _userManager.FindByIdAsync(model[i].UserId);
+                    IdentityResult result = null;
+
+                    if (model[i].IsSelected)
                     {
-                        continue;
+                        user.CompanyId = companyId;
+                        result = await _userManager.UpdateAsync(user);
+
+                    }
+                    else if (!model[i].IsSelected)
+                    {
+                        user.CompanyId = null;
+                        result = await _userManager.UpdateAsync(user);
                     }
                     else
                     {
-                        return RedirectToAction("Details", new { id = companyId });
+                        continue;
+                    }
+
+                    if (result.Succeeded)
+                    {
+                        if (i < (model.Count - 1))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            return RedirectToAction("Details", new { id = companyId });
+                        }
                     }
                 }
-            }
 
-            return RedirectToAction("Details", new { id = companyId });
+                return RedirectToAction("Details", new { id = companyId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When getting assign users to a company.");
+                throw;
+            }
       
         }
         //TODO change this return to not authorized

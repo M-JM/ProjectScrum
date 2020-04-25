@@ -1,10 +1,13 @@
 ﻿@model List<ApplicationUser>
 
+
 @{
     ViewData["Title"] = "All Users";
 }
 
-<h1>All Users</h1>
+    <div class="row-cols-1 mt-lg-5 mb-lg-5 text-center">
+        <h1>Overview of all users of company</h1>
+    </div>
 
 @if (Model.Any())
 {
@@ -15,11 +18,16 @@
     {
         <div class="card mb-3">
             <div class="card-header">
-                User Id : @user.Id
+                User Id : @user.Id   
             </div>
+            
             <div class="card-body">
                 <h5 class="card-title">
                     user name : @user.UserName
+                </h5>
+               
+                <h5 class="card-title">
+                   
                 </h5>
             </div>
             <div class="card-footer">

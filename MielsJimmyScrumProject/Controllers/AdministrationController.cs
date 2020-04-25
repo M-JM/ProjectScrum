@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MielsJimmyScrumProject.ViewModels.AdministrationViewModels;
 using MielsJimmyScrumProjectDAL.Models;
 using MielsJimmyScrumProjectDAL.Repositories;
@@ -20,18 +22,24 @@ namespace MielsJimmyScrumProject.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITaskRepository _taskRepository;
         private readonly IBoardRepository _boardRepository;
+        private readonly ILogger<AdministrationController> _logger;
 
         public AdministrationController(RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
             ITaskRepository taskRepository,
-            IBoardRepository boardRepository)
+            IBoardRepository boardRepository,
+            ILogger<AdministrationController> logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _taskRepository = taskRepository;
             _boardRepository = boardRepository;
+            _logger = logger;
+    
         }
          
+        //TODO when getting list of users include their role so it is easier to distinguish those who still need to be assigned a role.
+
         [HttpGet]
         public async Task<IActionResult> ListUsersAsync()
         {
@@ -41,6 +49,7 @@ namespace MielsJimmyScrumProject.Controllers
             if (User.IsInRole("Admin"))
             {
                users = _userManager.Users.Where(x => x.CompanyId == user.CompanyId && x.IsDeleted == false).ToList();
+
             }
             else
             {
@@ -62,45 +71,54 @@ namespace MielsJimmyScrumProject.Controllers
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
 
-            if (user == null)
-            {
-                ViewBag.ErrorMessage = $"User with Id = {id} cannot be found!";
-                return View("NotFound");
-            }
-            
-            var allRoles = _roleManager.Roles.ToList();
-            var AdminRoles = _roleManager.Roles.Skip(1).ToList();
-            var userRoles = await _userManager.GetRolesAsync(user);
-            if (User.IsInRole("SuperAdmin")) { 
-            
-            var model = new EditUserViewModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                Roles = userRoles,
-                AllRoles = allRoles,
-                              
-            };
-                return View(model);
-            }
-            else if (User.IsInRole("Admin"))
-            {
-                var model = new EditUserViewModel()
+                if (user == null)
                 {
-                    Id = user.Id,
-                    Email = user.Email,
-                    UserName = user.UserName,
-                    Roles = userRoles,
-                    AllRoles = AdminRoles
-                    
+                    ViewBag.ErrorMessage = $"User with Id = {id} cannot be found!";
+                    return View("NotFound");
+                }
 
-                };
-                return View(model);
+                var allRoles = _roleManager.Roles.ToList();
+                var AdminRoles = _roleManager.Roles.Skip(1).ToList();
+                var userRoles = await _userManager.GetRolesAsync(user);
+                if (User.IsInRole("SuperAdmin"))
+                {
+
+                    var model = new EditUserViewModel()
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        UserName = user.UserName,
+                        Roles = userRoles,
+                        AllRoles = allRoles,
+
+                    };
+                    return View(model);
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    var model = new EditUserViewModel()
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        UserName = user.UserName,
+                        Roles = userRoles,
+                        AllRoles = AdminRoles
+
+
+                    };
+                    return View(model);
+                }
+                return View("NotAuthorized");
             }
-            return View("NotAuthorized");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When trying to get the details to update an user");
+                throw;
+            }
            
         }
 
@@ -108,79 +126,95 @@ namespace MielsJimmyScrumProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUserAsync(EditUserViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var user = await _userManager.FindByIdAsync(model.Id);
-                var currentrole = await _userManager.GetRolesAsync(user);
-                
-
-                if (user == null)
+                if (ModelState.IsValid)
                 {
-                    ViewBag.ErrorMessage = $"User with Id = {model.Id} cannot be found!";
-                    return View("NotFound");
+                    var user = await _userManager.FindByIdAsync(model.Id);
+                    var currentrole = await _userManager.GetRolesAsync(user);
+
+
+                    if (user == null)
+                    {
+                        ViewBag.ErrorMessage = $"User with Id = {model.Id} cannot be found!";
+                        return View("NotFound");
+                    }
+
+                    else if (currentrole.Count == 0)
+                    {
+                        await _userManager.AddToRoleAsync(user, model.NewRole);
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+                    await _userManager.RemoveFromRoleAsync(user, currentrole.First());
+                    await _userManager.AddToRoleAsync(user, model.NewRole);
+
+                    user.Email = model.Email;
+                    user.UserName = model.UserName;
+
+                    var identityResult = await _userManager.UpdateAsync(user);
+
+                    if (identityResult.Succeeded)
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+
+                    foreach (var error in identityResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
 
-                else if (currentrole.Count == 0)
-                {
-                await _userManager.AddToRoleAsync(user, model.NewRole);
-                    return RedirectToAction("ListUsers", "Administration");
-                }
-                await _userManager.RemoveFromRoleAsync(user, currentrole.First());
-                await _userManager.AddToRoleAsync(user, model.NewRole);
-                
-                user.Email = model.Email;
-                user.UserName = model.UserName;
-                
-                var identityResult = await _userManager.UpdateAsync(user);
-
-                if (identityResult.Succeeded)
-                {
-                    return RedirectToAction("ListUsers", "Administration");
-                }
-
-                foreach (var error in identityResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When trying to update an user");
+                throw;
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> EditUserInRole(string roleId)
         {
-            ViewBag.roleId = roleId;
-
-            var role = await _roleManager.FindByIdAsync(roleId);
-
-            if (role == null)
+            try
             {
-                ViewBag.ErrorMessage = $"Role with Id = {roleId} cannot be found!";
-                return View("NotFound");
-            }
+                ViewBag.roleId = roleId;
 
-            var model = new List<UserRoleViewModel>();
+                var role = await _roleManager.FindByIdAsync(roleId);
 
-            var listUser = _userManager.Users.ToList();
-
-            foreach (var user in listUser)
-            {
-                var userRoleViewModel = new UserRoleViewModel()
+                if (role == null)
                 {
-                    UserId = user.Id,
-                    UserName = user.UserName,
-                    
-                };
+                    ViewBag.ErrorMessage = $"Role with Id = {roleId} cannot be found!";
+                    return View("NotFound");
+                }
 
-                var isInRole = await _userManager.IsInRoleAsync(user, role.Name);
+                var model = new List<UserRoleViewModel>();
 
-                userRoleViewModel.IsSelected = isInRole;
+                var listUser = _userManager.Users.ToList();
 
-                model.Add(userRoleViewModel);
+                foreach (var user in listUser)
+                {
+                    var userRoleViewModel = new UserRoleViewModel()
+                    {
+                        UserId = user.Id,
+                        UserName = user.UserName,
+
+                    };
+
+                    var isInRole = await _userManager.IsInRoleAsync(user, role.Name);
+
+                    userRoleViewModel.IsSelected = isInRole;
+
+                    model.Add(userRoleViewModel);
+                }
+
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When trying to update an user");
+                throw;
+            }
         }
 
 
@@ -237,56 +271,65 @@ namespace MielsJimmyScrumProject.Controllers
         [Authorize(Roles = "Admin")]
          public async Task<IActionResult> DeleteUserAsync(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            var roles = await _userManager.GetRolesAsync(user);
-            var boardsofuser = _boardRepository.GetBoardsOfUser(id);
-
-            if (user == null)
+            try
             {
-                ViewBag.ErrorMessage = $"User with Id = {id} cannot be found!";
-                return View("NotFound");
-            }
+                var user = await _userManager.FindByIdAsync(id);
+                var roles = await _userManager.GetRolesAsync(user);
+                var boardsofuser = _boardRepository.GetBoardsOfUser(id);
 
-            user.IsDeleted = true;
-            user.UpdatedDate = DateTime.Now;
-            user.UpdatedBy = User.Identity.Name;
-            
-            var tasks = _taskRepository.GetAllTasksofUser(user.Id);
-          
-            foreach(var role in roles) { 
-            await _userManager.RemoveFromRoleAsync(user, role);
-            }
+                if (user == null)
+                {
+                    ViewBag.ErrorMessage = $"User with Id = {id} cannot be found!";
+                    return View("NotFound");
+                }
 
-            foreach(var task in tasks)
-            {
-                task.IsDeleted = true;
-                task.UpdatedBy = User.Identity.Name;
-                task.UpdatedDate = DateTime.Now;
-            }
+                user.IsDeleted = true;
+                user.UpdatedDate = DateTime.Now;
+                user.UpdatedBy = User.Identity.Name;
 
-            foreach(var board in boardsofuser)
-            {
-                board.IsDeleted = true;
-                board.UpdatedBy = User.Identity.Name;
-                board.UpdatedDate = DateTime.Now;
-            }
+                var tasks = _taskRepository.GetAllTasksofUser(user.Id);
 
-            // delete related record in boarduser
+                foreach (var role in roles)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role);
+                }
 
-            var identityResult = await _userManager.UpdateAsync(user);
+                foreach (var task in tasks)
+                {
+                    task.IsDeleted = true;
+                    task.UpdatedBy = User.Identity.Name;
+                    task.UpdatedDate = DateTime.Now;
+                }
 
-            if (identityResult.Succeeded)
-            {
-             
+                foreach (var board in boardsofuser)
+                {
+                    board.IsDeleted = true;
+                    board.UpdatedBy = User.Identity.Name;
+                    board.UpdatedDate = DateTime.Now;
+                }
+
+                // delete related record in boarduser
+
+                var identityResult = await _userManager.UpdateAsync(user);
+
+                if (identityResult.Succeeded)
+                {
+
+                    return RedirectToAction("ListUsers", "Administration");
+                }
+
+                foreach (var error in identityResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
                 return RedirectToAction("ListUsers", "Administration");
             }
-
-            foreach (var error in identityResult.Errors)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                _logger.LogError(ex, $"When trying to delete an user");
+                throw;
             }
-
-            return RedirectToAction("ListUsers", "Administration");
         }
 
     }

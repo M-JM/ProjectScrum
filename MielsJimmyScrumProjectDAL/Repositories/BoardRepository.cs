@@ -131,17 +131,10 @@ namespace MielsJimmyScrumProjectDAL.Repositories
         public IEnumerable<BoardUser> GetBoardsOfUser(string id)
         {
 
-            var test = _context.BoardUsers.Where(x => x.ApplicationUser.Id == id && x.IsDeleted == false).ToList();
-
-            //var testing = _context.BoardUsers.Include(x => x.ApplicationUser)
-            //    .Where(x => x.ApplicationUserId == userId);
-            //var NEWTEST = _context.BoardUsers
-            //    .Include(x => x.ApplicationUser)
-            //    .Include(x => x.Board)
-            //    .Where(x => x.BoardId == id && x.IsDeleted == false && x.ApplicationUser.IsDeleted == false).ToList();
+            var boardsOfUser = _context.BoardUsers.Where(x => x.ApplicationUser.Id == id && x.IsDeleted == false).ToList();
 
 
-            return test;
+            return boardsOfUser;
         }
 
 
