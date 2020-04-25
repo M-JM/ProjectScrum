@@ -1,0 +1,121 @@
+﻿body {
+}
+
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    overflow: hidden;
+}
+
+a {
+    text-decoration: none;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.home {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 70vh;
+    background: #fff;
+}
+
+.prod-left {
+    width: 70%;
+    text-align: left;
+    padding-left: 100px;
+}
+
+.prod-right {
+    margin-left: 100px;
+    margin-top: 50px;
+    width: 45%;
+}
+
+.prod-left p {
+    margin: 10px 0;
+    font-size: 13pt;
+}
+
+.prod-head {
+    text-align: left;
+    font-weight: 400;
+    font-size: 30pt;
+    margin: 10px 0;
+}
+
+.prod-head-sub {
+    font-size: 14pt !important;
+    color: #000;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.prod-head-sub1 {
+    font-size: 15pt !important;
+    color: #0074c5;
+    margin: 40px 0 0 0 !important;
+    line-height: 1.5;
+}
+
+
+.prod-header {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+}
+
+.main-nav {
+    background: transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+    .main-nav a {
+        color: #000;
+        font-size: 14pt;
+        font-weight: 600;
+        background: 0074c51f;
+        margin: 10px 0;
+        padding: 0 5px;
+    }
+
+.nav-li {
+    cursor: pointer;
+    line-height: 2;
+    padding: 0 25px;
+    margin: 10px 0;
+}
+
+.li-h a {
+    color: #0074c5 !important;
+}
+
+.prod-feedback {
+    z-index: 1;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    transform: rotate(-90deg) translateY(-75px) translateX(80px);
+}
+
+.side-nav a {
+    color: #0074c5;
+    font-size: 10pt;
+    padding: 0;
+}
+
+.side-nav .nav-li {
+    padding: 0 5px;
+}
+
+

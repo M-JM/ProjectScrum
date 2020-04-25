@@ -34,9 +34,9 @@
 
                         <td>@board.Id</td>
                         <td>@board.Name</td>
-                        @if (board.BoardUsers != null && board.BoardUsers.Count() != 0)
+                        @if (board.BoardUsers != null && board.BoardUsers.Where(x => x.IsDeleted == false).Count() != 0)
                         {
-                            <td>@board.BoardUsers.Count() </td>
+                            <td>@board.BoardUsers.Where(x => x.IsDeleted == false).Count() </td>
                         }
                         else
                         {

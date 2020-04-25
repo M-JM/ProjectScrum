@@ -1,9 +1,11 @@
-﻿@{
+﻿@model LoginViewModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
-    <div class="row my-auto d-flex justify-content-center">
-        <div class="jumbotron col-10 justify-content-center">
+@*<div class="row mh-100 ">
+        <div class="jumbotron col-10 justify-content-center m-3">
             <h1 class="display-3">Scrum Web App</h1>
             <p class="lead">Enable Scrum for your company</p>
             <hr class="my-4">
@@ -11,4 +13,37 @@
             <p class="lead">
             </p>
         </div>
+    </div>*@
+
+<header >
+    <div class="container h-25 mt-lg-3">
+        <div class="row h-25 align-items-center justify-content-center text-center">
+            <div class="col-lg-10 align-self-end">
+                <h1>SCRUM WEB APPLICATION</h1>
+                <hr class="divider my-4" />
+            </div>
+          
+        </div>
     </div>
+</header>
+
+<div class="home">
+    <div class="prod-left l1">
+        <h1 class="prod-head">Welcome to SCRUM Web Application.</h1>
+        <p class="prod-head-sub">
+            This application has the purpose to allow your company to use Scrum and drive the efficienty of your company by ten-fold
+        </p>
+    </div>
+    <div class="prod-right r1 align-items-center justify-content-center">
+
+
+        <img src="~/images/download.png" style="width:300px; height:300px" />
+
+    </div>
+</div>
+
+@section Styles {
+    <link href="~/css/Index.css" rel="stylesheet" asp-append-version="true" />
+}
+
+

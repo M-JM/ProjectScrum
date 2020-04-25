@@ -120,7 +120,7 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         public Company GetById(int? Id)
         {
-            var company = _context.Companies.Find(Id);
+            var company = _context.Companies.Include(x => x.Employees).Where(x => x.Id == Id).FirstOrDefault();
             return company;
         }
 

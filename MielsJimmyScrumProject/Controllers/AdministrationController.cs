@@ -13,18 +13,23 @@ using MielsJimmyScrumProjectDAL.Repositories;
 
 namespace MielsJimmyScrumProject.Controllers
 {
-    // [Authorize(Roles = "SuperAdmin,Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public class AdministrationController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITaskRepository _taskRepository;
+        private readonly IBoardRepository _boardRepository;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ITaskRepository taskRepository)
+        public AdministrationController(RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            ITaskRepository taskRepository,
+            IBoardRepository boardRepository)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _taskRepository = taskRepository;
+            _boardRepository = boardRepository;
         }
          
         [HttpGet]
@@ -44,8 +49,9 @@ namespace MielsJimmyScrumProject.Controllers
                       
             return View(users);
         }
-        // [Authorize(Roles = "SuperAdmin")]
+       
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin")]
         public IActionResult ListRoles()
         {
             var roles = _roleManager.Roles.ToList();
@@ -116,7 +122,7 @@ namespace MielsJimmyScrumProject.Controllers
 
                 else if (currentrole.Count == 0)
                 {
-                    await _userManager.AddToRoleAsync(user, model.NewRole);
+                await _userManager.AddToRoleAsync(user, model.NewRole);
                     return RedirectToAction("ListUsers", "Administration");
                 }
                 await _userManager.RemoveFromRoleAsync(user, currentrole.First());
@@ -228,11 +234,12 @@ namespace MielsJimmyScrumProject.Controllers
         }
        
         
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "Admin")]
          public async Task<IActionResult> DeleteUserAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             var roles = await _userManager.GetRolesAsync(user);
+            var boardsofuser = _boardRepository.GetBoardsOfUser(id);
 
             if (user == null)
             {
@@ -257,12 +264,13 @@ namespace MielsJimmyScrumProject.Controllers
                 task.UpdatedDate = DateTime.Now;
             }
 
-            //foreach(var board in boards)
-            //{
-            //    board.IsDeleted = true;
-            //    board.UpdatedBy = User.Identity.Name;
-            //    board.UpdatedDate = DateTime.Now;
-            //}
+            foreach(var board in boardsofuser)
+            {
+                board.IsDeleted = true;
+                board.UpdatedBy = User.Identity.Name;
+                board.UpdatedDate = DateTime.Now;
+            }
+
             // delete related record in boarduser
 
             var identityResult = await _userManager.UpdateAsync(user);

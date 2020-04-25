@@ -54,7 +54,7 @@ namespace MielsJimmyScrumProject.Controllers
             var SuperAdminmodel = new SuperAdminIndexViewModel();
             {
                 SuperAdminmodel.boards = _boardRepository.GetAllBoards().ToList();
-                SuperAdminmodel.Companies = _companyRepository.GetAllCompanies().ToList();
+                SuperAdminmodel.Companies = _companyRepository.GetAllCompanies().Where(x => x.IsDeleted== false).ToList();
                 SuperAdminmodel.Users = _userManager.Users.Where(x => x.IsDeleted == false).ToList();
                 
 

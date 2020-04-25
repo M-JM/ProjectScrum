@@ -17,6 +17,8 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
         IEnumerable<BoardUser> GetUsersofBoard(int id);
 
+        IEnumerable<BoardUser> GetBoardsOfUser(string id);
+
         // CREATE
 
         Board Create(Board board);

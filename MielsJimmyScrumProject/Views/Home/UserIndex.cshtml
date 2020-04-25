@@ -4,7 +4,7 @@
     ViewData["Title"] = "User Landing Page";
     var company = Model.company;
     var photoPath = $"~/Images/{company.PhotoPath ?? "noimage.png"}";
-     var user = await userManager.GetUserAsync(Context.User);
+    var user = await userManager.GetUserAsync(Context.User);
 
 }
 
@@ -31,37 +31,46 @@
     </div>
 </div>
 
-<div class="row justify-content-center m-3">
+
+<div class="row justify-content-center m-3 text-center">
+    <div class="col-sm-8">
+      
+        <h3> Current Boards </h3>
+
+    </div>
+</div>
+
+<div class="row my-auto m-3 d-flex justify-content-center">
     <table class="table table-striped bg-light text-center">
         <thead>
             <tr>
 
                 <th scope="col">Id</th>
                 <th scope="col">Name</th>
-                <th scope="col"># Tasks Todo</th>
-                <th scope="col"># Tasks Doing</th>
-                <th scope="col"># Tasks Done</th>
+                <th scope="col"> my # Tasks Todo</th>
+                <th scope="col"> my # Tasks Doing</th>
+                <th scope="col"> my # Tasks Done</th>
                 <th scope="col"> Actions </th>
             </tr>
         </thead>
         <tbody class="">
             @foreach (var board in Model.boards)
             {
-            <tr>
+                <tr>
 
-                <td>@board.Id</td>
-                <td>@board.Name</td>
-                <td>@board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo && x.ApplicationUser == user && x.IsDeleted == false).Count() </td>
-                <td>@board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Doing && x.ApplicationUser == user && x.IsDeleted == false).Count() </td>
-                <td>@board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Done && x.ApplicationUser == user && x.IsDeleted == false).Count() </td>
+                    <td>@board.Id</td>
+                    <td>@board.Name</td>
+                    <td>@board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.ToDo && x.ApplicationUser == user && x.IsDeleted == false).Count() </td>
+                    <td>@board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Doing && x.ApplicationUser == user && x.IsDeleted == false).Count() </td>
+                    <td>@board.BoardTasks.Where(x => x.Status == ScrumTaskStatus.Done && x.ApplicationUser == user && x.IsDeleted == false).Count() </td>
 
-                <td>
-                   
-                    <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-success">View Details</a>
+                    <td>
 
-                </td>
+                        <a asp-action="TaskList" asp-controller="Tasks" asp-route-boardid="@board.Id" class="btn btn-success">View Details</a>
 
-            </tr>
+                    </td>
+
+                </tr>
             }
 
         </tbody>

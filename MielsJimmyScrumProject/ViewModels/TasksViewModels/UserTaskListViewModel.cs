@@ -9,5 +9,6 @@ namespace MielsJimmyScrumProject.ViewModels.TasksViewModels
     public class UserTaskListViewModel
     {
         public List<Board> Boards { get; set; }
+      
     }
 }

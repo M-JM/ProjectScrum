@@ -1,24 +1,61 @@
 ﻿body {
 }
-.collapsible {
-    background-color: #777;
-    color: white;
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
+/* Accordion */
+.accordion-container {
+    margin: 0.35rem 0;
+    margin-bottom: 1rem;
 }
 
-    .active, .collapsible:hover {
-        background-color: #555;
+    .accordion-container:focus {
+        outline: transparent;
     }
 
-.content {
-   
-    display: none;
-    overflow: hidden;
-   
+    .accordion-container:hover {
+        -webkit-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
+        -moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
+        box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
+        border-radius: 0.625rem;
+    }
+
+.accordion {
+    background-color: #8d9095;
+    color: black;
+    cursor: pointer;
+    padding: 0.75rem;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    border-radius: 0.625rem;
+}
+
+    .accordion:after {
+        content: '\25bc';
+        font-size: 0.75rem;
+        float: right;
+    }
+
+    .accordion:focus {
+        outline: transparent;
+    }
+
+.accordion-active:after {
+    content: '\25b2';
+}
+
+.accordion-active,
+.accordion:hover {
+    background-color: #8d9095;
+}
+
+.accordion-active {
+    border-radius: 0.625rem 0.625rem 0 0;
+}
+
+/* As a standart hide the content of a accordion */
+.accordion-panel {
+    padding: 1rem;
+    border: 1px solid #8d9095;
+    border-top: none;
+    border-radius: 0 0 0.625rem 0.625rem;
 }

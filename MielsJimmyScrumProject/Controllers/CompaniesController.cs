@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MielsJimmyScrumProject.Models;
 using MielsJimmyScrumProject.ViewModels.CompaniesViewModels;
 using MielsJimmyScrumProjectDAL.Models;
@@ -25,26 +26,40 @@ namespace MielsJimmyScrumProject.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ITaskRepository _taskRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<CompaniesController> _logger;
 
         public CompaniesController(ICompanyRepository companyRepository,
             IBoardRepository boardRepository,
             IWebHostEnvironment webHostEnvironment,
             ITaskRepository taskRepository,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            ILogger<CompaniesController> logger)
         {
             _companyRepository = companyRepository;
             _boardRepository = boardRepository;
             _webHostEnvironment = webHostEnvironment;
             _taskRepository = taskRepository;
             _userManager = userManager;
+            _logger = logger;
         }
 
         [Authorize(Roles = "SuperAdmin")]
         [HttpGet]
         public IActionResult CompanyList()
         {
-            var companyList = _companyRepository.GetAllCompanies();
-            return View(companyList);
+            try
+            {
+                var companyList = _companyRepository.GetAllCompanies().Where(x => x.IsDeleted == false);
+
+                return View(companyList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When retrieving Company List.");
+                throw;
+     
+            }
+          
         }
 
         [Authorize(Roles = "SuperAdmin")]
@@ -197,9 +212,12 @@ namespace MielsJimmyScrumProject.Controllers
             return View("NotAuthorized");
         }
 
-       
+       [HttpPost] 
         public IActionResult DeleteSure(int id)
         {
+
+            //  TODO Defensive and check if admin is from current company.
+
             var company = _companyRepository.GetById(id);
 
             company.IsDeleted = true;
@@ -211,9 +229,9 @@ namespace MielsJimmyScrumProject.Controllers
             if (response != null && response.Id != 0)
             {
                 var BoardsInDeletedCompany = _boardRepository.GetAllBoardsfromcompany(id).ToList();
-                var AllusersofCompany = _companyRepository.GetAllCompanyUsers(id);
+               // var AllusersofCompany = _companyRepository.GetAllCompanyUsers(id);
 
-                foreach(var user in AllusersofCompany)
+                foreach (var user in company.Employees)
                 {
                     user.IsDeleted = true;
                     user.UpdatedBy = User.Identity.Name;
@@ -236,20 +254,17 @@ namespace MielsJimmyScrumProject.Controllers
                         task.UpdatedDate = DateTime.Now;
                         _taskRepository.Delete(task);
                     }
-                        _boardRepository.Delete(board);
-                   
+                    _boardRepository.Delete(board);
+
                 }
                 if (User.IsInRole("Admin")) { 
 
                 return RedirectToAction("Logout","Account");
                 }
-                else
-                {
-                return View("CompanyList");
-                }
-            }
 
-            return View();
+                return RedirectToAction("CompanyList");
+            }
+            return View("Delete",company) ;
         }
 
         [HttpGet]

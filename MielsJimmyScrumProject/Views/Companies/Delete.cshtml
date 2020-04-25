@@ -26,16 +26,22 @@
 
             </div>
             <div class="card-footer text-center">
-                <a class="btn btn-danger" asp-action="DeleteSure" asp-controller="Companies" asp-route-id="@Model.Id">
+
+                <form asp-action="DeleteSure" asp-controller="Companies">
+                    <input hidden asp-for="@Model.Id"/>
+                    <button class= "btn btn-danger">
                     Are you sure you want to delete ?
-                </a>
+                    </button>
+                </form>
+
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary">Back</a>
+                    <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary mt-2">Back</a>
                 }
                 else
                 {
-                    <a asp-action="details" asp-controller="Companies" asp-route-id="@Model.Id" class="btn btn-secondary">Back</a>
+                   
+                    <a asp-action="details" asp-controller="Companies" asp-route-id="@Model.Id" class="btn btn-secondary mt-2">Back</a>
                 }
             </div>
         </div>

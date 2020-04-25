@@ -36,28 +36,38 @@ namespace MielsJimmyScrumProject.Controllers
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> CreateAsync(int companyid)
         {
-            
-            var company = _companyRepository.GetById(companyid);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-            if (company == null || company.IsDeleted == true) {
-                Response.StatusCode = 404;
-                return View("../Companies/CompanyNotFound", companyid);
-            }
-            else if (User.IsInRole("SuperAdmin") ||
-              User.IsInRole("Admin") && companyid == currentuser.CompanyId)
-
+            try
             {
-                BoardCreateViewModel boardCreateViewModel = new BoardCreateViewModel()
+                var company = _companyRepository.GetById(companyid);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+
+
+                if (company == null || company.IsDeleted == true)
                 {
+                    Response.StatusCode = 404;
+                    return View("../Companies/CompanyNotFound", companyid);
+                }
+                else if (User.IsInRole("SuperAdmin") ||
+                  User.IsInRole("Admin") && companyid == currentuser.CompanyId)
 
-                    Company = company,
+                {
+                    BoardCreateViewModel boardCreateViewModel = new BoardCreateViewModel()
+                    {
 
-                };
-                return View(boardCreateViewModel);
+                        Company = company,
+
+                    };
+                    return View(boardCreateViewModel);
+                }
+                return View("NotAuthorized");
             }
-          return View("NotAuthorized");
-                        
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When getting the create form.");
+                throw;
+            }
+
 }
 
         [HttpPost]
@@ -65,82 +75,109 @@ namespace MielsJimmyScrumProject.Controllers
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> CreateAsync(BoardCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var IsSuperAdmin = User.IsInRole("SuperAdmin");
-                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                if (ModelState.IsValid)
+                {
+                    var IsSuperAdmin = User.IsInRole("SuperAdmin");
+                    var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-                if (IsSuperAdmin || User.IsInRole("Admin") && model.CompanyId == currentuser.CompanyId) { 
-
-                    model.CreatedDate = DateTime.Now;
-                    model.CreatedBy = User.Identity.Name;
-
-                    var response = _boardRepository.Create(model);
-
-                    if (response != null && response.Id != 0)
+                    if (IsSuperAdmin || User.IsInRole("Admin") && model.CompanyId == currentuser.CompanyId)
                     {
-                        return RedirectToAction("details", new { id = model.Id });
-                    }        
+
+                        model.CreatedDate = DateTime.Now;
+                        model.CreatedBy = User.Identity.Name;
+
+                        var response = _boardRepository.Create(model);
+
+                        if (response != null && response.Id != 0)
+                        {
+                            return RedirectToAction("details", new { id = model.Id });
+                        }
+                    }
+                    return View("NotAuthorized");
                 }
-                return View("NotAuthorized");
+                return View(model);
             }
-            return View(model);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When getting the create form.");
+                throw;
+            }
         }
 
 
         [HttpGet]
         public async Task<IActionResult> DetailsAsync(int id)
         {
-            var board = _boardRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var UserBoards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id && x.IsDeleted == false)).ToList();
-
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", id);
-            }
-            else if (User.IsInRole("SuperAdmin") ||
-                User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId
-                || User.IsInRole("User") && board.CompanyId == currentuser.CompanyId && UserBoards.Contains(board)
-                ) { 
+                var board = _boardRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var UserBoards = _boardRepository.GetAllBoardsfromcompany(currentuser.CompanyId).Where(x => x.BoardUsers.Any(x => x.ApplicationUserId == currentuser.Id && x.IsDeleted == false)).ToList();
 
-                BoardDetailViewModel detailViewModel = new BoardDetailViewModel()
-            {
-                Board  = board
-            };
-            return View(detailViewModel);
+                if (board == null || board.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", id);
+                }
+                else if (User.IsInRole("SuperAdmin") ||
+                    User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId
+                    || User.IsInRole("User") && board.CompanyId == currentuser.CompanyId && UserBoards.Contains(board)
+                    )
+                {
+
+                    BoardDetailViewModel detailViewModel = new BoardDetailViewModel()
+                    {
+                        Board = board
+                    };
+                    return View(detailViewModel);
+                }
+                return View("NotAuthorized");
             }
-            return View("NotAuthorized");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When getting the details from board.");
+                throw;
+                
+            }
         }
 
         [HttpGet]
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> UpdateAsync(int id)
         {
-            var board = _boardRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
-            
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", id);
-            }
-            else if (IsSuperAdmin || User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId)
-            {
-                var boardEditViewModel = new BoardEditViewModel
-            {
-                Id = board.Id,
-                Name = board.Name,
-                Description = board.Description,
-              
-            };
+                var board = _boardRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
 
-            return View(boardEditViewModel);
+                if (board == null || board.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", id);
+                }
+                else if (IsSuperAdmin || User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId)
+                {
+                    var boardEditViewModel = new BoardEditViewModel
+                    {
+                        Id = board.Id,
+                        Name = board.Name,
+                        Description = board.Description,
+
+                    };
+
+                    return View(boardEditViewModel);
+                }
+                //return RedirectToAction("NotAuthorized", "Account");
+                return View("NotAuthorized");
             }
-            //return RedirectToAction("NotAuthorized", "Account");
-            return View("NotAuthorized");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When getting the update form from board.");
+                throw;
+            }
         }
 
 
@@ -149,107 +186,135 @@ namespace MielsJimmyScrumProject.Controllers
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> UpdateAsync(BoardEditViewModel editModel)
         {
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
-            var board = _boardRepository.GetById(editModel.Id);
-
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", board.Id);
-            }
-            else if (IsSuperAdmin || User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId) { 
-                if (ModelState.IsValid)
-            {
-              
-                board.Name = editModel.Name;
-                board.Description = editModel.Description;
-                board.UpdatedDate = DateTime.Now;
-                board.UpdatedBy = User.Identity.Name;
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
+                var board = _boardRepository.GetById(editModel.Id);
 
-                
-                var response = _boardRepository.Update(board);
-
-                if (response != null & response.Id != 0)
+                if (board == null || board.IsDeleted == true)
                 {
-                    return RedirectToAction("BoardsList");
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", board.Id);
                 }
+                else if (IsSuperAdmin || User.IsInRole("Admin") && board.CompanyId == currentuser.CompanyId)
+                {
+                    if (ModelState.IsValid)
+                    {
+
+                        board.Name = editModel.Name;
+                        board.Description = editModel.Description;
+                        board.UpdatedDate = DateTime.Now;
+                        board.UpdatedBy = User.Identity.Name;
+
+
+                        var response = _boardRepository.Update(board);
+
+                        if (response != null & response.Id != 0)
+                        {
+                            return RedirectToAction("BoardsList");
+                        }
+                    }
+                    return View();
+                }
+                return View("NotAuthorized");
             }
-            return View();
-        }
-            return View("NotAuthorized");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"When updating the board.");
+                throw;
+            }
         }
 
         [HttpGet]
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var board = _boardRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-            var IsSuperAdmin = User.IsInRole("SuperAdmin");
-
-
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", id);
+                var board = _boardRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
+                var IsSuperAdmin = User.IsInRole("SuperAdmin");
+
+
+                if (board == null || board.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", id);
+                }
+                else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId)
+                {
+                    return View(board);
+
+                }
+                return View("NotAuthorized");
             }
-            else if (IsSuperAdmin || board.CompanyId == currentuser.CompanyId) { 
-                return View(board);
-        
-        }
-            return View("NotAuthorized");
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, $"When getting the delete .");
+                throw;
+            }
         }
 
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> DeleteSureAsync(int id)
         {
-            var board = _boardRepository.GetById(id);
-            var currentuser = await _userManager.GetUserAsync(HttpContext.User);
-
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", id);
-            }
-            else if (User.IsInRole("SuperAdmin") || board.CompanyId == currentuser.CompanyId)
-            {
+                var board = _boardRepository.GetById(id);
+                var currentuser = await _userManager.GetUserAsync(HttpContext.User);
 
-            board.IsDeleted = true;
-            board.UpdatedBy = User.Identity.Name;
-            board.UpdatedDate = DateTime.Now;
-
-            var response = _boardRepository.Delete(board);
-
-            if (response != null && response.Id != 0)
-            {
-                var TasksinDeletedBoard = _taskRepository.GetAllTasksofBoard(id).ToList();
-                var UserAssignedtoBoard = board.BoardUsers.ToList();
-
-                foreach (var user in UserAssignedtoBoard)
+                if (board == null || board.IsDeleted == true)
                 {
-                    user.IsDeleted = true;
-                    user.UpdatedBy = User.Identity.Name;
-                    user.UpdatedDate = DateTime.Now;
-
-                    _boardRepository.RemoveBoardUser(user);
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", id);
                 }
-
-                foreach (var tasks in TasksinDeletedBoard)
+                else if (User.IsInRole("SuperAdmin") || board.CompanyId == currentuser.CompanyId)
                 {
-                    tasks.IsDeleted = true;
-                    tasks.UpdatedBy = User.Identity.Name;
-                    tasks.UpdatedDate = DateTime.Now;
 
-                    _taskRepository.Delete(tasks);
+                    board.IsDeleted = true;
+                    board.UpdatedBy = User.Identity.Name;
+                    board.UpdatedDate = DateTime.Now;
+
+                    var response = _boardRepository.Delete(board);
+
+                    if (response != null && response.Id != 0)
+                    {
+                        var TasksinDeletedBoard = _taskRepository.GetAllTasksofBoard(id).ToList();
+                        var UserAssignedtoBoard = board.BoardUsers.ToList();
+
+                        foreach (var user in UserAssignedtoBoard)
+                        {
+                            user.IsDeleted = true;
+                            user.UpdatedBy = User.Identity.Name;
+                            user.UpdatedDate = DateTime.Now;
+
+                            _boardRepository.RemoveBoardUser(user);
+                        }
+
+                        foreach (var tasks in TasksinDeletedBoard)
+                        {
+                            tasks.IsDeleted = true;
+                            tasks.UpdatedBy = User.Identity.Name;
+                            tasks.UpdatedDate = DateTime.Now;
+
+                            _taskRepository.Delete(tasks);
+                        }
+
+                        return RedirectToAction("BoardsList");
+                    }
+
+                    return View(board);
                 }
-
-                return RedirectToAction("BoardsList");
+                return View("NotAuthorized");
             }
+            catch (Exception ex)
+            {
 
-            return View(board);
-        }
-            return View("NotAuthorized");
+                _logger.LogError(ex, $"When deleting a board.");
+                throw;
+            }
         }
         [HttpGet]
         public async Task<IActionResult> BoardsListAsync()
@@ -282,7 +347,8 @@ namespace MielsJimmyScrumProject.Controllers
             catch (Exception ex )
             {
 
-                return View("error", ex);
+                _logger.LogError(ex, $"When getting the list of boards.");
+                throw;
             }
           
             }
@@ -292,48 +358,59 @@ namespace MielsJimmyScrumProject.Controllers
         [Authorize(Roles = "SuperAdmin, Admin")]
         public IActionResult AssignUsers(int boardId)
         {
-            ViewBag.boardId = boardId;
-            // send the boardid via viewbag since we cannot retrieve the boardid via the list given to the model.
-
-            var board = _boardRepository.GetById(boardId);
-
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", boardId);
-            }
+                ViewBag.boardId = boardId;
+                // send the boardid via viewbag since we cannot retrieve the boardid via the list given to the model.
+
+                var board = _boardRepository.GetById(boardId);
+
+                if (board == null || board.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", boardId);
+                }
 
 
-            var model = new List<AssignUsersViewModel>();
-            var userList = _companyRepository.GetAllCompanyUsers(board.CompanyId).ToList();
+                var model = new List<AssignUsersViewModel>();
+                var userList = _companyRepository.GetAllCompanyUsers(board.CompanyId).ToList();
 
-            foreach (var user in userList)
-            {
-                // check if exists and is true == IsSelected moet ingevuld
-                var IsAssigned = _boardRepository.FindBoardUser(boardId, user.Id) ;
-               
-                if(IsAssigned != null) { 
+                foreach (var user in userList)
+                {
+                    // check if exists and is true == IsSelected moet ingevuld
+                    var IsAssigned = _boardRepository.FindBoardUser(boardId, user.Id);
 
-               var AssignUserModel = new AssignUsersViewModel()
+                    if (IsAssigned != null)
                     {
-                        UserId = user.Id,
-                        UserName = user.UserName,
-                        IsSelected = !IsAssigned.IsDeleted 
-                };
-                    model.Add(AssignUserModel);
+
+                        var AssignUserModel = new AssignUsersViewModel()
+                        {
+                            UserId = user.Id,
+                            UserName = user.UserName,
+                            IsSelected = !IsAssigned.IsDeleted
+                        };
+                        model.Add(AssignUserModel);
+                    }
+                    else
+                    {
+                        var Usermodel = new AssignUsersViewModel()
+                        {
+
+                            UserId = user.Id,
+                            UserName = user.UserName,
+                            IsSelected = false
+                        };
+                        model.Add(Usermodel);
+                    }
                 }
-                else { 
-            var Usermodel = new AssignUsersViewModel()
-            {
-                
-                UserId = user.Id,
-                UserName = user.UserName,
-                IsSelected = false
-            };
-            model.Add(Usermodel);
-                }
+                return View(model);
             }
-            return View(model);
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, $"When getting the users for assignment to board.");
+                throw;
+            }
         }
 
         [HttpPost]
@@ -341,64 +418,74 @@ namespace MielsJimmyScrumProject.Controllers
         [Authorize(Roles = "SuperAdmin, Admin")]
         public async Task<IActionResult> AssignUsersAsync(List<AssignUsersViewModel> model, int boardId)
         {
-            var board = _boardRepository.GetById(boardId);
-
-            if (board == null || board.IsDeleted == true)
+            try
             {
-                Response.StatusCode = 404;
-                return View("BoardNotFound", boardId);
-            }
+                var board = _boardRepository.GetById(boardId);
 
-            for (int i = 0; i < model.Count(); i++)
+                if (board == null || board.IsDeleted == true)
+                {
+                    Response.StatusCode = 404;
+                    return View("BoardNotFound", boardId);
+                }
+
+                for (int i = 0; i < model.Count(); i++)
+                {
+                    var user = await _userManager.FindByIdAsync(model[i].UserId);
+                    var Exists = _boardRepository.FindBoardUser(boardId, user.Id);
+                    var ExistingBoardUser = _boardRepository.FindBoardUserById(boardId, user.Id);
+
+                    BoardUser boardsuser = new BoardUser
+                    {
+                        BoardId = boardId,
+                        Board = board,
+                        ApplicationUserId = user.Id,
+                        ApplicationUser = user,
+                        CreatedBy = User.Identity.Name,
+                        CreatedDate = DateTime.Now
+
+                    };
+
+                    // is selected but does not exist CREATE
+                    if (model[i].IsSelected && Exists == null)
+                    {
+
+                        _boardRepository.AssignBoardUser(boardsuser);
+                    }
+                    // is not selected and exist then update to delete
+                    else if (!model[i].IsSelected && Exists != null)
+                    {
+                        ExistingBoardUser.IsDeleted = true;
+                        ExistingBoardUser.UpdatedBy = User.Identity.Name;
+                        ExistingBoardUser.UpdatedDate = DateTime.Now;
+                        _boardRepository.UpdateBoardUser(ExistingBoardUser);
+
+                    }
+                    else if (model[i].IsSelected && Exists != null)
+                    // is selected and exists but is false
+                    {
+                        ExistingBoardUser.IsDeleted = false;
+                        ExistingBoardUser.UpdatedBy = User.Identity.Name;
+                        ExistingBoardUser.UpdatedDate = DateTime.Now;
+                        _boardRepository.UpdateBoardUser(ExistingBoardUser);
+                    }
+
+                    _logger.LogInformation("NO changes to the assigned user");
+                }
+
+                return RedirectToAction("Details", new { id = boardId });
+            }
+            catch (Exception ex)
             {
-                var user = await _userManager.FindByIdAsync(model[i].UserId);
-                var Exists = _boardRepository.FindBoardUser(boardId, user.Id);
-                var ExistingBoardUser = _boardRepository.FindBoardUserById(boardId, user.Id);
-
-                 BoardUser boardsuser = new BoardUser
-                {
-                    BoardId = boardId,
-                    Board = board,
-                    ApplicationUserId = user.Id,
-                    ApplicationUser = user,
-                    CreatedBy = User.Identity.Name,
-                    CreatedDate = DateTime.Now
-                   
-                };
-
-                // is selected but does not exist CREATE
-                if (model[i].IsSelected && Exists == null)
-                {
-
-                    _boardRepository.AssignBoardUser(boardsuser);
-                }
-                // is not selected and exist then update to delete
-                else if (!model[i].IsSelected && Exists != null)
-                {
-                    ExistingBoardUser.IsDeleted = true;
-                    ExistingBoardUser.UpdatedBy = User.Identity.Name;
-                    ExistingBoardUser.UpdatedDate = DateTime.Now;
-                    _boardRepository.UpdateBoardUser(ExistingBoardUser);
-
-                }
-                else if (model[i].IsSelected && Exists != null)
-                // is selected and exists but is false
-                {
-                    ExistingBoardUser.IsDeleted = false;
-                    ExistingBoardUser.UpdatedBy = User.Identity.Name;
-                    ExistingBoardUser.UpdatedDate = DateTime.Now;
-                    _boardRepository.UpdateBoardUser(ExistingBoardUser);
-                }
-
-                _logger.LogInformation("NO changes to the assigned user");       
+                _logger.LogError(ex, $"When reassigning the users  to board.");
+                throw;
             }
-
-            return RedirectToAction("Details", new {id = boardId });
         }
     }
 
 }
 
+// ALTERNATIVE METHOD TO ASSIGN USERS USING GOTO STATMENTS
+// NOT FUNCTIONAL, Requires adjustment but might reduce number of code lines
 
 // Exists in Db and is checked => do nothing 
 

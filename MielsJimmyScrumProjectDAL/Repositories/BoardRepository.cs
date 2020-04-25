@@ -117,6 +117,8 @@ namespace MielsJimmyScrumProjectDAL.Repositories
             var test = _context.BoardUsers.Include(x => x.ApplicationUser)
                 .Where(x => x.BoardId == id && x.IsDeleted == false).ToList();
 
+            //var testing = _context.BoardUsers.Include(x => x.ApplicationUser)
+            //    .Where(x => x.ApplicationUserId == userId);
             //var NEWTEST = _context.BoardUsers
             //    .Include(x => x.ApplicationUser)
             //    .Include(x => x.Board)
@@ -125,6 +127,23 @@ namespace MielsJimmyScrumProjectDAL.Repositories
 
             return test;
         }
+
+        public IEnumerable<BoardUser> GetBoardsOfUser(string id)
+        {
+
+            var test = _context.BoardUsers.Where(x => x.ApplicationUser.Id == id && x.IsDeleted == false).ToList();
+
+            //var testing = _context.BoardUsers.Include(x => x.ApplicationUser)
+            //    .Where(x => x.ApplicationUserId == userId);
+            //var NEWTEST = _context.BoardUsers
+            //    .Include(x => x.ApplicationUser)
+            //    .Include(x => x.Board)
+            //    .Where(x => x.BoardId == id && x.IsDeleted == false && x.ApplicationUser.IsDeleted == false).ToList();
+
+
+            return test;
+        }
+
 
         public Board Update(Board board)
         {

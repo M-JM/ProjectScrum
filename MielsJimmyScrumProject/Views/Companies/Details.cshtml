@@ -7,11 +7,11 @@
 }
 
 
-<div class="row justify-content-center m-3">
+<div class="row justify-content-center m-3 mt-lg-5">
     <div class="col-sm-6">
         <div class="card">
             <div class="card-header">
-                <h1>@company.Name</h1>
+                <h1 class="text-center">@company.Name</h1>
             </div>
 
             <div class="card-body text-center">
@@ -22,24 +22,24 @@
                 <h4>Created Date: @company.CreatedDate</h4>
             </div>
 
-
-            <a asp-action="Create" asp-controller="Boards" asp-route-companyid="@company.Id" class="btn btn-success">Create new board</a>
-            <a asp-action="AssignEmployees" asp-controller="Companies" asp-route-companyid="@company.Id" class="btn btn-success mt-2" >Assign Employees</a>
-
-
             <div class="card-footer text-center">
-                <a asp-action="Update" asp-controller="Companies" asp-route-id="@company.Id" class="btn btn-warning mb-2">Edit</a>
-                <a asp-action="Delete" asp-controller="Companies" asp-route-id="@company.Id" class="btn btn-danger mb-2">Delete</a>
-                
-                @if (User.IsInRole("Admin"))
-                {
-                    <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary mb-2">Back</a>
-                }
-                else
-                {
-                     <a asp-action="CompanyList" asp-controller="Companies" class="btn btn-secondary mb-2">Back</a>
-                }
+                <a asp-action="Create" asp-controller="Boards" asp-route-companyid="@company.Id" class="btn btn-success">Create new board</a>
+                <a asp-action="AssignEmployees" asp-controller="Companies" asp-route-companyid="@company.Id" class="btn btn-success">Assign Employees</a>
+                </div>
+
+                <div class="card-footer text-center">
+                    <a asp-action="Update" asp-controller="Companies" asp-route-id="@company.Id" class="btn btn-warning mb-2 ">Edit</a>
+                    <a asp-action="Delete" asp-controller="Companies" asp-route-id="@company.Id" class="btn btn-danger mb-2">Delete</a>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="AdminIndex" asp-controller="Home" class="btn btn-secondary mb-2">Back</a>
+                    }
+                    else
+                    {
+                        <a asp-action="CompanyList" asp-controller="Companies" class="btn btn-secondary mb-2">Back</a>
+                    }
+                </div>
             </div>
         </div>
-    </div>
 </div>
