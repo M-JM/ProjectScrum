@@ -162,22 +162,34 @@ namespace MielsJimmyScrumProject.Controllers
                     }
                     else if (await _userManager.IsInRoleAsync(currentuser, "User") && currentuser.IsDeleted == false)
                     {
-                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-                        return RedirectToAction("UserIndex", "Home");
+                      var result =  await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                      
+                        if (result.Succeeded)
+                        {
+                            return RedirectToAction("UserIndex", "Home");
+                        }
                     }
                     else if (await _userManager.IsInRoleAsync(currentuser, "SuperAdmin") && currentuser.IsDeleted == false)
                     {
-                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-                        return RedirectToAction("SuperAdminIndex", "Home");
+                        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                      
+                        if (result.Succeeded)
+                        {
+                            return RedirectToAction("SuperAdminIndex", "Home");
+                        }
                     }
                     else if(currentuser.IsDeleted == false)
                     {
-                        await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-                        return RedirectToAction("Index", "Home");
+                        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                        
+                        if (result.Succeeded)
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
                     }
                     else if(currentuser.IsDeleted == true)
                     {
-                        ModelState.AddModelError(string.Empty, "Account does not exist");
+                        ModelState.AddModelError(string.Empty, "Account does not exist anymore");
                         return View();
                     }
 
