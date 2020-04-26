@@ -67,20 +67,25 @@
                 <input type="hidden" asp-for="Userid" value="@currentUser.Id">
             }
                       
-            <div class="btn-toolbar" role="toolbar">
-                @if (User.IsInRole("Admin"))
-                {
-                    <input type="submit" value="Create" class="btn btn-success mr-1 " />
-                    <a class="btn btn-dark mr-1" asp-action="details" asp-controller="Boards" asp-route-id="@Model.BoardId">Back to board details</a>
-                }
-                else if (User.IsInRole("User"))
-                {
-                    <input type="submit" value="Create" class="btn btn-success mr-1 " />
-                    <a asp-action="tasklist" asp-controller="tasks" asp-route-boardid="@Model.BoardId" class="btn btn-primary mr-1">Back to overview</a>
-                }
+        <div class="btn-toolbar" role="toolbar">
+            @if (User.IsInRole("Admin"))
+            {
+                <input type="submit" value="Create" class="btn btn-success mr-1 " />
+                <a class="btn btn-dark mr-1" asp-action="details" asp-controller="Boards" asp-route-id="@Model.BoardId">Back to board details</a>
+            }
+            @if (User.IsInRole("User"))
+            {
+                <input type="submit" value="Create" class="btn btn-success mr-1 " />
+                <a asp-action="tasklist" asp-controller="tasks" asp-route-boardid="@Model.BoardId" class="btn btn-primary mr-1">Back to overview</a>
+            }
+            @if (User.IsInRole("SuperAdmin"))
+            {
+                <input type="submit" value="Create" class="btn btn-success mr-1 " />
+                <a asp-action="tasklist" asp-controller="tasks" asp-route-boardid="@Model.BoardId" class="btn btn-primary mr-1">Back to overview</a>
+            }
 
 
-            </div>
+        </div>
         </form>
     </div>
 </div>
