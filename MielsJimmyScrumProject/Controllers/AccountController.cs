@@ -66,7 +66,7 @@ namespace MielsJimmyScrumProject.Controllers
                     var result = await _userManager.CreateAsync(user, model.Password);
                     var receivedUser = await _userManager.FindByEmailAsync(model.Email);
                     await _userManager.AddToRoleAsync(receivedUser, "User");
-                    // If user is successfully created
+                   
                     if (result.Succeeded)
                     {
                         return RedirectToAction("ListUsers", "Administration");
